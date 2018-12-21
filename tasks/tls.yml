@@ -1,0 +1,37 @@
+- name: Installing required pkgs
+  yum:
+    name: mod_ssl
+    state: latest
+  notify: restart_httpd
+
+- name: Default (tuned but not cert/key) ssl.conf
+  template:
+    src: templates/ssl.conf.j2
+    dest: /etc/httpd/conf.d/ssl.conf
+  notify: restart_httpd  
+
+- name: Opening up https fw rule
+  include_role:
+    name: iptables
+    tasks_from: custom-policy
+  vars:
+    iptables_policy_name: https
+    iptables_protocol: tcp
+    iptables_port: "443"
+    iptables_source: "0.0.0.0/0"
+  when: httpd_public
+  tags:
+    - iptables
+- name: Opening up https fw rule for ipv6
+  include_role:
+    name: iptables
+    tasks_from: custom-policy-ipv6
+  vars:
+    iptables_policy_name: https
+    iptables_protocol: tcp
+    iptables_port: "443"
+    iptables_source: "::/0"
+  when: httpd_public
+  tags:
+    - iptables
+

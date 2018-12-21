@@ -1,0 +1,22 @@
+# This task is to be included with {{ pki_hostname }} in various roles
+# This will copy (re)new certs at proper place and reload httpd
+- name: TLS certs for {{ pki_hostname }}
+  copy:
+    src: "{{ pkistore }}/{{ item }}"
+    dest: "/etc/pki/tls/certs/{{ item }}"
+  with_items:
+    - "{{ pki_hostname }}.crt"
+    - "{{ pki_hostname }}-CAChain.crt"
+  tags:
+    - tls
+  notify: restart_httpd
+
+- name: TLS key for {{ pki_hostname }}
+  copy:
+    src: "{{ pkistore }}/{{ item }}"
+    dest: "/etc/pki/tls/private/{{ item }}"
+  with_items:
+    - "{{ pki_hostname }}.key"
+  tags:
+    - tls
+  notify: restart_httpd

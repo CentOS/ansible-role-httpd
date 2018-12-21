@@ -1,0 +1,13 @@
+#add file types
+AddType application/x-tar .tgz
+AddType application/x-bittorrent .torrent
+
+NameVirtualHost *:80
+# By default allowing redirecting to central node for LetsEncrypt certbot validation
+ <Location "/.well-known/acme-challenge/">
+     ProxyPass "http://cephas.centos.org/.well-known/acme-challenge/"
+ </Location>
+
+# Default Header
+Alias /header /var/www/centos/header
+

@@ -1,0 +1,53 @@
+- name: Ensuring httpd is installed
+  yum: 
+    name: httpd 
+    state: installed
+
+- name: Default basic config
+  template:
+    src: "templates/{{ item }}.j2"
+    dest: "/etc/httpd/conf.d/{{ item }}"
+  with_items:
+    - 01_common.conf
+    - welcome.conf
+  notify: restart_httpd 
+
+- name: Distribute default CentOS header files
+  copy:
+    src: centos
+    dest: /var/www/
+
+- name: Ensuring httpd service is started
+  service: 
+    name: httpd 
+    state: started 
+    enabled: true
+
+- name: Opening up httpd rule
+  include_role:
+    name: iptables
+    tasks_from: custom-policy
+  vars:
+    iptables_policy_name: httpd
+    iptables_protocol: tcp
+    iptables_port: "80"
+    iptables_source: "0.0.0.0/0"
+  when: httpd_public
+  tags:
+    - iptables
+
+- name: Opening up httpd rule over ipv6
+  include_role:
+    name: iptables
+    tasks_from: custom-policy-ipv6
+  vars:
+    iptables_policy_name: httpd
+    iptables_protocol: tcp
+    iptables_port: "80"
+    iptables_source: "::/0"
+  when: httpd_public
+  tags:
+    - iptables
+
+- include_tasks: tls.yml
+  when: httpd_tls

@@ -1,0 +1,9 @@
+# Default Variables for httpd role
+# Should iptables be open by default ?
+httpd_public: True
+
+# Should openssl/mod_ssl be installed by default
+httpd_tls: False
+
+# Central LetsEncrypt node for the cerbot redirection
+httpd_certbot_fqdn: certbot.domain.com
