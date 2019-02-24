@@ -1,0 +1,15 @@
+<div id="page">
+
+<h1>People of CentOS</h2>
+This is an area where the CentOS Developers and allowed contributors can make test files and other things available that are not yet part of CentOS. <br>
+Some items here will make it into CentOS, CentOS Extras and/or CentOS Plus ... while other things may not.
+
+<h2><b>Use anything here at your own risk!!!!</b></h2>
+
+The following users currently have areas on people.centos.org: (sorted by First name)<br><br>
+
+<ul>
+{% for user in people_users|sort(attribute='full_name') %}
+<li> <a href="/{{ user.login_name }}/">{{ user.full_name }} ({{ user.login_name }})</a></li>
+{% endfor %}
+</ul>

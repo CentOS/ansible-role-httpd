@@ -1,0 +1,56 @@
+<VirtualHost *:443>
+DocumentRoot "/var/www/people"
+
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set X-Xss-Protection "1; mode=block"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "same-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  RewriteEngine On
+  RewriteCond $1 !^.well-known
+  RewriteCond      %{REQUEST_URI} ^/([^/]+)
+  RewriteCond /home/%1 -d
+  RewriteRule ^/([^/]+)(.*) /home/$1/public_html/$2
+
+  HeaderName /header/header.html
+  ReadmeName /README.html
+  # Global for each user directory
+  IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
+
+  <Directory "/var/www/people">
+    Options Indexes FollowSymLinks
+    <IfVersion < 2.4>
+    Order allow,deny
+    Allow from all
+    </IfVersion>
+    <IfVersion >= 2.4>
+    IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
+    Require all granted
+    </IfVersion>
+  </Directory>
+
+ErrorLog logs/ssl-people.centos.org_error.log
+TransferLog logs/ssl-people.centos.org_access.log
+LogLevel warn
+SSLEngine on
+SSLHonorCipherOrder on
+SSLProtocol all -SSLv2 -SSLv3
+SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW:!aNULL:!eNULL:!DES:!MD5:!PSK:!RC4
+SSLCertificateFile /etc/pki/tls/certs/people.centos.org.crt
+SSLCertificateKeyFile /etc/pki/tls/private/people.centos.org.key
+SSLCertificateChainFile /etc/pki/tls/certs/people.centos.org-CAChain.crt
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+SetEnvIf User-Agent ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog logs/ssl-seven.centos.org_request.log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>                               
+
+

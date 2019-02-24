@@ -7,3 +7,15 @@ httpd_tls: False
 
 # Central LetsEncrypt node for the cerbot redirection
 httpd_certbot_fqdn: certbot.domain.com
+
+# Zabbix monitoring
+httpd_zabbix_templates:
+  - Template CentOS http server
+httpd_zabbix_groups:
+  - CentOS HTTP servers
+
+httpd_tls_zabbix_templates:
+  - Template CentOS - https SSL Cert Check External
+httpd_tls_zabbix_groups:
+  - CentOS HTTPS servers
+  
