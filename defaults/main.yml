@@ -8,6 +8,9 @@ httpd_tls: False
 # Central LetsEncrypt node for the cerbot redirection
 httpd_certbot_fqdn: certbot.domain.com
 
+# Apache httpd settings (see https://httpd.apache.org/docs/current/mod/mpm_common.html)
+httpd_maxrequestworkers: 512
+
 # Zabbix monitoring
 httpd_zabbix_templates:
   - Template CentOS http server

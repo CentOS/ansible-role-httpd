@@ -11,3 +11,10 @@ NameVirtualHost *:80
 # Default Header
 Alias /header /var/www/centos/header
 
+# Prefork tuning
+<IfModule mpm_prefork_module>
+    ServerLimit               {{ httpd_maxrequestworkers * 1.5 }}
+    MaxRequestWorkers         {{ httpd_maxrequestworkers }}
+    MaxConnectionsPerChild    {{ httpd_maxrequestworkers * 5 }}
+</IfModule>
+
