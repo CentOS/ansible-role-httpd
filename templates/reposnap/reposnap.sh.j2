@@ -1,0 +1,10 @@
+#!/bin/bash
+today=$(date +%Y%m%d)
+logfile={{ reposnap_local_dir }}/logs/$today.log
+
+# First we sync the master tree from master-1
+rsync {{ reposnap_rsync_from }} {{ reposnap_local_dir }}/reposnap/latest/ -avH --delete-before >$logfile 2>&1
+
+# Now we "archive" with hardlinks
+/bin/cp -al {{ reposnap_local_dir }}/reposnap/latest/ {{ reposnap_local_dir }}/reposnap/$today >>$logfile
+

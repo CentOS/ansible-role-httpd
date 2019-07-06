@@ -1,0 +1,25 @@
+<VirtualHost *:80>
+ ServerAdmin webmaster@centos.org
+ ServerName mirrorsnap.centos.org
+ ServerAlias reposnap.centos.org
+ DocumentRoot {{ reposnap_local_dir }}/reposnap/
+
+Alias /reposnap {{ reposnap_local_dir }}/reposnap/
+Alias /reposnap/ {{ reposnap_local_dir }}/reposnap
+
+<Directory "{{ reposnap_local_dir }}/reposnap">
+ AllowOverride Indexes
+  Options Indexes FollowSymLinks 
+  <IfVersion < 2.4>
+    Order allow,deny
+    Allow from all
+  </IfVersion>
+  <IfVersion >= 2.4>
+    IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
+    Require all granted
+  </IfVersion>
+ </Directory>
+
+</VirtualHost>
+
+

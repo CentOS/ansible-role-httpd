@@ -1,0 +1,31 @@
+- name: Ensuring we have local directories
+  file:
+    state: directory
+    path: "{{ reposnap_local_dir }}/{{ item }}"
+    setype: public_content_t  
+  with_items:
+    - logs
+    - scripts
+    - reposnap
+
+- name: reposnap vhost config
+  template:
+    src: 99_reposnap.conf.j2
+    dest: /etc/httpd/conf.d/99_reposnap.conf
+  notify:
+    - restart_httpd
+
+- name: Script to snapshot mirror
+  template:
+    src: reposnap/reposnap.sh.j2
+    dest: "{{ reposnap_local_dir }}/scripts/reposnap.sh"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: reposnap cron job
+  cron:
+    name: Reposnap cron job
+    job: "{{ reposnap_local_dir }}/scripts/reposnap.sh"
+    hour: 23
+    minute: 55
