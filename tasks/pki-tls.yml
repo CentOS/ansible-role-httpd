@@ -9,6 +9,7 @@
     - "{{ pki_hostname }}-CAChain.crt"
   tags:
     - tls
+    - pki
   notify: restart_httpd
 
 - name: TLS key for {{ pki_hostname }}
@@ -19,4 +20,5 @@
     - "{{ pki_hostname }}.key"
   tags:
     - tls
+    - pki
   notify: restart_httpd
