@@ -1,0 +1,35 @@
+<VirtualHost *:443>
+ ServerAdmin webmaster@centos.org
+ ServerName console.qa.centos.org
+ DocumentRoot /var/www/html
+
+ Header always set Strict-Transport-Security "max-age=31536000"
+
+<Location "/">
+ ProxyPass "http://localhost:8080/"
+ ProxyPassReverse "http://localhost:8080/"
+</Location>
+
+ErrorLog logs/console.qa.centos.org_error.log
+TransferLog logs/console.qa.centos.org_access.log
+LogLevel warn
+SSLEngine on
+SSLHonorCipherOrder on
+SSLProtocol all -SSLv2 -SSLv3
+SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW:!aNULL:!eNULL:!DES:!MD5:!PSK:!RC4
+SSLCertificateFile /etc/pki/tls/certs/console.qa.centos.org.crt
+SSLCertificateKeyFile /etc/pki/tls/private/console.qa.centos.org.key
+SSLCertificateChainFile /etc/pki/tls/certs/console.qa.centos.org-CAChain.crt
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+SetEnvIf User-Agent ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog logs/ssl-console.qa.centos.org_request.log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>   
+

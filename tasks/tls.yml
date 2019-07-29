@@ -45,5 +45,5 @@
   delegate_to: "{{ zabbix_api_srv }}"  
   tags:
     - monitoring
-  when: zabbix_api_srv is defined
+  when: zabbix_api_srv is defined and zabbix_api_srv != 'None'
 
