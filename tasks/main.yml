@@ -3,6 +3,11 @@
     name: httpd 
     state: installed
 
+- name: Systemd snippet directory
+  file:
+    path: /etc/systemd/system/httpd.service.d/
+    state: directory
+
 - name: Default basic config
   template:
     src: "templates/{{ item }}.j2"
