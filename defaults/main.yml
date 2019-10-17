@@ -26,3 +26,6 @@ httpd_tls_zabbix_groups:
 # For reposnap task
 reposnap_local_dir: /srv/reposnap
 reposnap_rsync_from: msync.centos.org::centos/
+
+# For SCL php task
+scl_php_ver: 72

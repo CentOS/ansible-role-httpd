@@ -2,28 +2,38 @@
   yum:
     name: centos-release-scl
     state: installed
+  tags:
+    - php 
 
 - name: Ensuring we have php from SCL installed
   yum:
     name: "{{ item }}"
     state: latest
   with_items:
-    - rh-php71
-    - rh-php71-php-xml
-    - rh-php71-php-mbstring 
-    - rh-php71-php-gd 
-    - rh-php71-php-soap 
-    - rh-php71-php-mysqlnd 
-    - rh-php71-php-fpm
+    - rh-php{{ scl_php_ver }}
+    - rh-php{{ scl_php_ver }}-php-xml
+    - rh-php{{ scl_php_ver }}-php-xmlrpc
+    - rh-php{{ scl_php_ver }}-php-mbstring 
+    - rh-php{{ scl_php_ver }}-php-gd 
+    - rh-php{{ scl_php_ver }}-php-soap 
+    - rh-php{{ scl_php_ver }}-php-mysqlnd 
+    - rh-php{{ scl_php_ver }}-php-fpm
+  tags:
+    - php 
 
 - name: Enabling PHP FPM
   service:
-    name: rh-php71-php-fpm
+    name: rh-php{{ scl_php_ver }}-php-fpm
     state: started
     enabled: True
-
+  tags:
+    - php 
+-
 - name: Adding php fpm to httpd conf
   template:
     src: scl-php-fpm.conf.j2
     dest: /etc/httpd/conf.d/php-fpm.conf
-  notify: restart_httpd  
+  notify: restart_httpd
+  tags:
+    - php 
+
