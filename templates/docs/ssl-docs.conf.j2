@@ -1,0 +1,41 @@
+<VirtualHost *:443>
+ ServerAdmin webmaster@centos.org
+ ServerName docs.centos.org
+ DocumentRoot /var/www/docs.centos.org
+
+ Header always set Strict-Transport-Security "max-age=31536000"
+ Header always set X-Xss-Protection "1; mode=block"
+ Header always set X-Content-Type-Options "nosniff"
+ Header always set Referrer-Policy "same-origin"
+ Header always set X-Frame-Options "SAMEORIGIN"
+
+<Location "/.well-known/">
+    ProxyPass "http://cephas.centos.org/.well-known/"
+</Location>
+
+ErrorLog logs/ssl-docs.centos.org_error.log
+TransferLog logs/ssl-docs.centos.org_access.log
+LogLevel warn
+SSLEngine on
+SSLHonorCipherOrder on
+SSLProtocol all -SSLv2 -SSLv3
+SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW:!aNULL:!eNULL:!DES:!MD5:!PSK:!RC4
+
+SSLCertificateFile /etc/pki/tls/certs/docs.centos.org.crt
+SSLCertificateKeyFile /etc/pki/tls/private/docs.centos.org.key
+SSLCertificateChainFile /etc/pki/tls/certs/docs.centos.org-CAChain.crt
+
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+SetEnvIf User-Agent ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog logs/ssl-docs.centos.org_request.log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>                               
+
+

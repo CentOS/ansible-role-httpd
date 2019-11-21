@@ -1,0 +1,40 @@
+- import_role:
+    name: httpd
+    tasks_from: pki-tls
+  vars:
+    pki_hostname: docs.centos.org
+
+- name: Configuring httpd vhost for people
+  template:
+    src: "docs/{{ item }}.j2"
+    dest: "/etc/httpd/conf.d/{{ item }}"
+  with_items:
+    - 03_docs.conf
+    - ssl-docs.conf
+  notify:
+    - restart_httpd
+
+- name: Ensuring we have a docroot
+  file:
+    path: /var/www/docs.centos.org
+    state: directory
+
+- name: Enabling needed selinux booleans
+  seboolean:
+    name: "{{ item }}"
+    persistent: yes
+    state: on
+  with_items:
+    - httpd_can_network_connect
+
+- name: Ensuring backup user and jobs
+  include_role:
+    name: centos-backup
+    tasks_from: client
+  vars:
+    - centos_role: httpd-doc
+    - role_backup_folders:
+        - /var/www/docs.centos.org
+  tags:
+    - backup
+   

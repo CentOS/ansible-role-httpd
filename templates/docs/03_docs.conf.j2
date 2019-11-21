@@ -1,0 +1,17 @@
+<VirtualHost *:80>
+   ServerName docs.centos.org
+   DocumentRoot /var/www/docs.centos.org/
+   CustomLog logs/docs.centos.org_access.log combined
+   ErrorLog logs/docs.centos.org_error.log
+
+   RewriteEngine On
+   RewriteCond $1 !^.well-known
+   RewriteCond %{HTTPS} !=on
+   RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+
+   <Location "/.well-known/">
+     ProxyPass "http://cephas.centos.org/.well-known/"
+   </Location>
+
+</VirtualHost>
+
