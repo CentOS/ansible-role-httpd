@@ -1,0 +1,22 @@
+- import_role:
+    name: httpd
+    tasks_from: pki-tls
+  vars:
+    pki_hostname: centosproject.org
+
+- name: Configuring httpd vhost for people
+  template:
+    src: "centosproject/{{ item }}.j2"
+    dest: "/etc/httpd/conf.d/{{ item }}"
+  with_items:
+    - 02_centosproject.conf
+    - ssl-centosproject.conf
+  notify:
+    - restart_httpd
+
+- name: Ensuring we have a docroot
+  file:
+    path: /var/www/centosproject.org
+    state: directory
+
+   
