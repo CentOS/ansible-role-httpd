@@ -1,0 +1,82 @@
+<VirtualHost *:443>
+DocumentRoot "/var/www/html/"
+
+
+ Header always set Strict-Transport-Security "max-age=31536000"  
+ Header always set X-Frame-Options "SAMEORIGIN"
+ Header always set X-Xss-Protection "1; mode=block"
+ Header always set X-Content-Type-Options "nosniff"
+ Header always set Referrer-Policy "same-origin"
+
+Alias /rpmbuild /rpmbuild
+
+ <Directory "/rpmbuild">
+  AllowOverride Indexes
+  Options Indexes FollowSymLinks MultiViews
+  IndexOptions NameWidth=*
+  <IfVersion < 2.4>
+    Order allow,deny
+    Allow from all
+  </IfVersion>
+  <IfVersion >= 2.4>
+    Require all granted
+  </IfVersion>
+ </Directory>
+
+
+
+Alias /repodir /repodir
+
+ <Directory "/repodir">
+  AllowOverride Indexes
+  Options Indexes FollowSymLinks MultiViews
+  IndexOptions NameWidth=*
+  <IfVersion < 2.4>
+    Order allow,deny
+    Allow from all
+  </IfVersion>
+  <IfVersion >= 2.4>
+    Require all granted
+  </IfVersion>
+ </Directory>
+
+Alias /repos /repos
+
+ <Directory "/repos">
+  AllowOverride Indexes
+  Options Indexes FollowSymLinks MultiViews
+  IndexOptions NameWidth=*
+  <IfVersion < 2.4>
+    Order allow,deny
+    Allow from all
+  </IfVersion>
+  <IfVersion >= 2.4>
+    Require all granted
+  </IfVersion>
+ </Directory>
+
+
+ErrorLog logs/ssl-armv7-dev.centos.org_error.log
+TransferLog logs/ssl-armv7-dev.centos.org_access.log
+LogLevel warn
+SSLEngine on
+SSLHonorCipherOrder on
+SSLProtocol all -SSLv2 -SSLv3
+SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW:!aNULL:!eNULL:!DES:!MD5:!PSK:!RC4
+SSLCertificateFile /etc/pki/tls/certs/armv7.dev.centos.org.crt
+SSLCertificateKeyFile /etc/pki/tls/private/armv7.dev.centos.org.key
+SSLCertificateChainFile /etc/pki/tls/certs/armv7.dev.centos.org-CAChain.crt
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+SetEnvIf User-Agent ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog logs/ssl-armv7.dev.centos.org_request.log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>                               
+
+

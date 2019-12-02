@@ -1,0 +1,18 @@
+- import_role:
+    name: httpd
+    tasks_from: pki-tls
+  vars:
+    pki_hostname: armv7.dev.centos.org
+
+- name: Configuring httpd vhost for people
+  template:
+    src: "armv7/{{ item }}.j2"
+    dest: "/etc/httpd/conf.d/{{ item }}"
+  with_items:
+    - 02_armv7-dev.conf
+    - ssl-armv7-dev.conf
+  notify:
+    - restart_httpd
+
+
+   
