@@ -1,0 +1,9 @@
+
+- name: vhost configs
+  template:
+    src: 99_vhost-shared-dir.conf.j2
+    dest: "/etc/httpd/conf.d/99_vhost_{{ item.name }}.conf"
+  with_items: "{{ httpd_vhost_shared_list }}"  
+  notify:
+    - restart_httpd
+
