@@ -1,3 +1,15 @@
+# This task can be included and will parse the httpd_vhost_shared_list
+# Example:
+# httpd_vhost_shared_list:
+#   - name: test
+#     fqdn: test.domain.com
+#     path: /srv/test
+#   - name: restricted
+#     fqdn: test2.domain.com
+#     path: /srv/test2
+#     acl:
+#       - 192.168.1.0/23
+#  
 
 - name: vhost configs
   template:
