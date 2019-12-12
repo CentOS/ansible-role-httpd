@@ -29,8 +29,8 @@
 # for a site where these directories are restricted to read-only.
 #
 <Directory "/home/*/public_html">
+    IndexOptions NameWidth=* +SuppressHTMLPreamble
     AllowOverride FileInfo AuthConfig Limit Indexes
     Options MultiViews Indexes SymLinksIfOwnerMatch IncludesNoExec
     Require method GET POST OPTIONS
 </Directory>
-
