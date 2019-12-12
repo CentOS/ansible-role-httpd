@@ -3,10 +3,11 @@
   CustomLog logs/people.centos.org_access.log combined
   ErrorLog logs/people.centos.org_error.log
   DocumentRoot /var/www/people
-  HeaderName /header/header.html
-  ReadmeName /README.html
+  HeaderName /centos-design/header.html
+  ReadmeName /centos-design/footer.html
   # Global for each user directory
-  IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
+  IndexOptions +SuppressHTMLPreamble
+  IndexStyleSheet "/centos-design/css/centos-listindex.css"
 
   <Directory "/var/www/people">
     Options Indexes FollowSymLinks
@@ -15,7 +16,8 @@
     Allow from all
     </IfVersion>
     <IfVersion >= 2.4>
-    IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
+    IndexOptions +SuppressHTMLPreamble
+    IndexStyleSheet "/centos-design/css/centos-listindex.css"
     Require all granted
     </IfVersion>
   </Directory>

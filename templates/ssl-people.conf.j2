@@ -13,10 +13,11 @@ DocumentRoot "/var/www/people"
   RewriteCond /home/%1 -d
   RewriteRule ^/([^/]+)(.*) /home/$1/public_html/$2
 
-  HeaderName /header/header.html
-  ReadmeName /README.html
+  HeaderName /centos-design/header.html
+  ReadmeName /centos-design/footer.html
   # Global for each user directory
-  IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
+  IndexOptions +SuppressHTMLPreamble NameWidth=*
+  IndexStyleSheet "/centos-design/css/centos-listindex.css"
 
   <Directory "/var/www/people">
     Options Indexes FollowSymLinks
@@ -25,7 +26,8 @@ DocumentRoot "/var/www/people"
     Allow from all
     </IfVersion>
     <IfVersion >= 2.4>
-    IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
+    IndexOptions +SuppressHTMLPreamble NameWidth=*
+    IndexStyleSheet "/centos-design/css/centos-listindex.css"
     Require all granted
     </IfVersion>
   </Directory>

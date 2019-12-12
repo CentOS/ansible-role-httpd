@@ -44,7 +44,7 @@
   register: user_list_html
 
 - name: Creating index.html if needed 
-  shell: cat /var/www/centos/header/header.html /var/www/people/users.html > /var/www/people/index.html
+  shell: cat /var/www/centos-design/header.html /var/www/people/users.html /var/www/centos-design/footer.html > /var/www/people/index.html
   when: user_list_html is changed
 
 - name: Configuring httpd vhost for people
