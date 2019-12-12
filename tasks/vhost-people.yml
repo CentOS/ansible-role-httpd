@@ -37,14 +37,22 @@
     state: directory
     mode: 0755
 
-- name: Creating users lists for people vhost
+- name: Creating header for people vhosts
+  vars:
+    httpd_htmlhead_title: "People of CentOS"
+  template:
+    src: header.html.j2
+    dest: /var/www/people/header.html
+  when: user_list_html is changed
+
+- name: Creating users list for people vhost
   template:
     src: people-users.j2
     dest: /var/www/people/users.html
   register: user_list_html
 
-- name: Creating index.html if needed 
-  shell: cat /var/www/centos-design/header.html /var/www/people/users.html /var/www/centos-design/footer.html > /var/www/people/index.html
+- name: Creating index.html for people vhosts
+  shell: cat /var/www/people/header.html /var/www/people/users.html /var/www/centos-design/footer.html >> /var/www/people/index.html
   when: user_list_html is changed
 
 - name: Configuring httpd vhost for people

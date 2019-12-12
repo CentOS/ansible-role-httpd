@@ -25,6 +25,11 @@
     - centos
     - centos-design
 
+- name: Creating CentOS default header
+  template:
+    src: header.html.j2
+    dest: /var/www/centos-design/header.html
+
 - name: Ensuring httpd service is started
   service: 
     name: httpd 
