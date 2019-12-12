@@ -1,0 +1,29 @@
+table#indexlist {
+  width: 100%;
+}
+
+/* Icon column
+ * --------------------------------------------------- */
+th.indexcolicon,
+td.indexcolicon {
+  width: 24px;
+}
+
+/* File name column
+ * --------------------------------------------------- */
+th.indexcolicon,
+td.indexcolicon,
+th.indexcolname,
+td.indexcolname {
+  padding: 5px;
+}
+
+
+/* Alternating even and odd rows
+ * --------------------------------------------------- */
+tr.odd {
+  background: #f5f5f5;
+}
+tr.even {
+  background: #ffffff;
+}
