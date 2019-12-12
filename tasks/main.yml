@@ -19,8 +19,11 @@
 
 - name: Distribute default CentOS header files
   copy:
-    src: centos
+    src: "{{ item }}"
     dest: /var/www/
+  with_items:
+    - centos
+    - centos-design
 
 - name: Ensuring httpd service is started
   service: 
