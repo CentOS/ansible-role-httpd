@@ -11,8 +11,9 @@ httpd_certbot_fqdn: certbot.domain.com
 # Apache httpd settings (see https://httpd.apache.org/docs/current/mod/mpm_common.html)
 httpd_maxrequestworkers: 512
 
-# Text we see in browser title bar.
-httpd_htmlhead_title: "CentOS"
+# Page information
+httpd_html_autoindex_title: "CentOS"
+httpd_html_autoindex_content: ""
 
 # Zabbix monitoring
 httpd_zabbix_templates:
