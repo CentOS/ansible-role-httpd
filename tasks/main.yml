@@ -28,7 +28,7 @@
 - name: Creating CentOS default header
   template:
     src: header.html.j2
-    dest: /var/www/centos-design/header-{{ httpd_html_index_title | lower | replace(" ","-") }}.html
+    dest: /var/www/centos-design/header-{{ httpd_html_autoindex_title | lower | replace(" ","-") }}.html
 
 - name: Ensuring httpd service is started
   service: 
