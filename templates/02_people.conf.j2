@@ -3,29 +3,23 @@
   CustomLog logs/people.centos.org_access.log combined
   ErrorLog logs/people.centos.org_error.log
   DocumentRoot /var/www/people
-  HeaderName /centos-design/header.html
-  ReadmeName /centos-design/footer.html
   # Global for each user directory
-  IndexOptions +SuppressHTMLPreamble
-  IndexStyleSheet "/centos-design/css/centos-listindex.css"
 
   <Directory "/var/www/people">
     Options Indexes FollowSymLinks
     <IfVersion < 2.4>
-    Order allow,deny
-    Allow from all
+      Order allow,deny
+      Allow from all
     </IfVersion>
     <IfVersion >= 2.4>
-    IndexOptions +SuppressHTMLPreamble
-    IndexStyleSheet "/centos-design/css/centos-listindex.css"
-    Require all granted
+      Require all granted
     </IfVersion>
   </Directory>
 
-   RewriteEngine On
-   RewriteCond $1 !^.well-known
-   RewriteCond %{HTTPS} !=on
-   RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+  RewriteEngine On
+  RewriteCond $1 !^.well-known
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
 
 </VirtualHost>
 
