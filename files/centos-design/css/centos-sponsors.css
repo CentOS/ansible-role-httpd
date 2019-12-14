@@ -1,0 +1,8 @@
+/* Footer showing sponsors
+-------------------------------------------------- */
+body {
+  margin-bottom: 250px; /* Margin bottom by footer height */
+}
+.footer {
+  height: 250px; /* Set the fixed height of the footer here */
+}
