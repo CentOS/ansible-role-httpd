@@ -12,6 +12,9 @@ NameVirtualHost *:80
 Alias /header /var/www/centos/header
 Alias /centos-design /var/www/centos-design
 
+# Some customized ErrorDocument files
+ErrorDocument 404 /centos-design/404.html
+
 # Prefork tuning
 <IfModule mpm_prefork_module>
     ServerLimit               {{ httpd_maxrequestworkers * 1.5 }}
