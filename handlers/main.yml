@@ -1,4 +1,9 @@
 - name: restart_httpd
   service: 
     name: httpd 
-    state: restarted 
+    state: restarted
+
+- name: reload_httpd
+  service:
+    name: httpd
+    state: reloaded
