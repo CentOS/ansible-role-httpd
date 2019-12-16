@@ -1,0 +1,81 @@
+- import_role:
+    name: httpd
+    tasks_from: pki-tls
+  vars:
+    pki_hostname: www.centos.org
+
+- name: Ensuring that scponly is installed for specific shell
+  yum:
+    name: rssh
+    state: installed
+
+- name: Ensuring some protocols are allowed through rssh
+  blockinfile:
+    path: /etc/rssh.conf
+    block: |
+      allowscp
+      allowsftp
+      allowrsync
+
+- name: Default umask for rssh push
+  lineinfile:
+    path: /etc/rssh.conf
+    regexp: '^umask =' 
+    line: 'umask = 002'
+    state: present
+
+- name: Adding specific webcontent user and restricted shell
+  user: 
+    name: '{{ item.login_name }}' 
+    state: present 
+    comment: CentOS Web content user
+    groups: rsshusers
+    append: True
+    shell: /bin/rssh
+  with_items: "{{ httpd_www_push_users }}"  
+  
+- name: Importing local users ssh pub keys
+  authorized_key: 
+    user: '{{ item.0.login_name }}' 
+    key: "{{ item.1 }}"
+  with_subelements: 
+    - '{{ httpd_www_push_users }}'  
+    - ssh_pub_keys
+
+- name: Ensuring we have a DocumentRoot
+  file:
+    path: "/var/www/centos_website/"
+    state: directory
+    owner: '{{ item.login_name }}'
+    group: '{{ item.login_name }}'
+    mode: 0775
+  with_items: "{{ httpd_www_push_users }}"  
+
+
+- name: Configuring httpd vhost for people
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/httpd/conf.d/{{ item }}"
+  with_items:
+    - 02_vhost-www.conf
+    - ssl-vhost-www.conf
+  notify:
+    - reload_httpd
+  tags:
+    - config
+
+- name: Script to gather dynamic content
+  template:
+    src: www/content-download.sh.j2
+    dest: /usr/libexec/centos/content-download.sh
+    mode: 0755
+  tags:
+    - cron
+
+- name: Cron to gather content
+  cron:
+    name: Gathering rss and csv files for website
+    job: /usr/libexec/centos/content-download.sh
+    minute: "*/5"
+  tags:
+    - cron

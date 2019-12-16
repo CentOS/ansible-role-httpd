@@ -1,0 +1,40 @@
+<VirtualHost *:443>
+ ServerAdmin webmaster@centos.org
+ ServerName {{ httpd_www_hostname }}
+ DocumentRoot {{ httpd_www_rootdir }}
+
+ Header always set Strict-Transport-Security "max-age=31536000"  
+ Header always set X-Frame-Options "SAMEORIGIN"
+ Header always set X-Xss-Protection "1; mode=block"
+ Header always set X-Content-Type-Options "nosniff"
+ Header always set Referrer-Policy "same-origin"
+
+RewriteEngine on
+
+{{ httpd_www_snippet }}
+
+ErrorLog logs/ssl-{{ httpd_www_hostname }}_error.log
+TransferLog logs/ssl-{{ httpd_www_hostname }}_access.log
+LogLevel warn
+SSLEngine on
+SSLHonorCipherOrder on
+SSLProtocol all -SSLv2 -SSLv3
+SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW:!aNULL:!eNULL:!DES:!MD5:!PSK:!RC4
+
+SSLCertificateFile /etc/pki/tls/certs/{{ httpd_www_hostname }}.crt
+SSLCertificateKeyFile /etc/pki/tls/private/{{ httpd_www_hostname }}.key
+SSLCertificateChainFile /etc/pki/tls/certs/{{ httpd_www_hostname }}-CAChain.crt
+
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+SetEnvIf User-Agent ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog logs/ssl-{{ httpd_www_hostname }}_request.log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>                               
+
