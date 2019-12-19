@@ -48,3 +48,6 @@ httpd_www_snippet: |
   # This is a snippet block coming from ansible inventory
 
 
+# For internal-mirrorlist task
+# FQDN of internal mirror we want to redirect yum/dnf clients to
+httpd_mirrorlist_internal_url: mirror.centos.org

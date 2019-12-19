@@ -1,0 +1,51 @@
+<?php
+$release=$_GET['release'];
+$repo=$_GET['repo'];
+$arch=$_GET['arch'];
+
+if ($release == '6') {
+  $contentdir = "centos";
+} elseif ($release == '7' and $arch == 'x86_64') {
+  $contentdir = "centos";
+} elseif ($release == '8') {
+  $contentdir = "centos";
+} elseif ($release == '8-stream') {
+  $contentdir = "centos";
+} else {
+  $contentdir = "altarch";
+}
+
+if ($release == '8') {
+  if(strpos($repo,'-')===false)
+  {
+      print "http://{{ httpd_mirrorlist_internal_url }}/$contentdir/$release/$repo/$arch/os/\n" ;
+  }
+  else
+  {
+    $data=preg_split('/-/',$repo,2);
+    print "http://{{ httpd_mirrorlist_internal_url }}/$contentdir/$release/${data[0]}/$arch/${data[1]}/os/\n" ;
+  }
+} elseif ($release == '8-stream') {
+  if(strpos($repo,'-')===false)
+  {
+      print "http://{{ httpd_mirrorlist_internal_url }}/$contentdir/$release/$repo/$arch/os/\n" ;
+  }
+  else
+  {
+    $data=preg_split('/-/',$repo,2);
+    print "http://{{ httpd_mirrorlist_internal_url }}/$contentdir/$release/${data[0]}/$arch/${data[1]}/os/\n" ;
+  }
+} else { 
+  if(strpos($repo,'-')===false)
+  {
+      print "http://{{ httpd_mirrorlist_internal_url }}/$contentdir/$release/$repo/$arch/\n" ;
+  }
+  else
+  {
+    $data=preg_split('/-/',$repo,2);
+    print "http://{{ httpd_mirrorlist_internal_url }}/$contentdir/$release/${data[0]}/$arch/${data[1]}/\n" ;
+  }
+}
+
+
+?>
