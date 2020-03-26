@@ -23,7 +23,7 @@ if ($release == '8') {
   else
   {
     $data=preg_split('/-/',$repo,2);
-    print "http://{{ httpd_mirrorlist_internal_url }}/$contentdir/$release/${data[0]}/$arch/${data[1]}/os/\n" ;
+    print "http://{{ httpd_mirrorlist_internal_url }}/$contentdir/$release/${data[0]}/$arch/${data[1]}/\n" ;
   }
 } elseif ($release == '8-stream') {
   if(strpos($repo,'-')===false)
@@ -33,7 +33,7 @@ if ($release == '8') {
   else
   {
     $data=preg_split('/-/',$repo,2);
-    print "http://{{ httpd_mirrorlist_internal_url }}/$contentdir/$release/${data[0]}/$arch/${data[1]}/os/\n" ;
+    print "http://{{ httpd_mirrorlist_internal_url }}/$contentdir/$release/${data[0]}/$arch/${data[1]}/\n" ;
   }
 } else { 
   if(strpos($repo,'-')===false)
