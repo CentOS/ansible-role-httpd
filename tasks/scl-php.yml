@@ -7,17 +7,8 @@
 
 - name: Ensuring we have php from SCL installed
   yum:
-    name: "{{ item }}"
+    name: ['rh-php{{ scl_php_ver }}', 'rh-php{{ scl_php_ver }}-php-xml', 'rh-php{{ scl_php_ver }}-php-xmlrpc', 'rh-php{{ scl_php_ver }}-php-mbstring', 'rh-php{{ scl_php_ver }}-php-gd', 'rh-php{{ scl_php_ver }}-php-soap', 'rh-php{{ scl_php_ver }}-php-mysqlnd', 'rh-php{{ scl_php_ver }}-php-fpm']
     state: latest
-  with_items:
-    - rh-php{{ scl_php_ver }}
-    - rh-php{{ scl_php_ver }}-php-xml
-    - rh-php{{ scl_php_ver }}-php-xmlrpc
-    - rh-php{{ scl_php_ver }}-php-mbstring 
-    - rh-php{{ scl_php_ver }}-php-gd 
-    - rh-php{{ scl_php_ver }}-php-soap 
-    - rh-php{{ scl_php_ver }}-php-mysqlnd 
-    - rh-php{{ scl_php_ver }}-php-fpm
   tags:
     - php 
 
