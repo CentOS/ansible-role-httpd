@@ -84,3 +84,12 @@
   yum:
     name: ['podman', 'git']
     state: installed
+
+- name: Enabling needed selinux booleans
+  seboolean:
+    name: "{{ item }}"
+    persistent: yes
+    state: on
+  with_items:
+    - httpd_can_network_connect
+
