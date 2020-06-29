@@ -1,3 +1,6 @@
+# This task is more or less equivalent to vhost-www except that it also renders (through podman) website content
+# Once done, it will push to other nodes rendered website (through specific keys allowed on web nodes
+
 - import_role:
     name: httpd
     tasks_from: pki-tls
@@ -52,7 +55,7 @@
   with_items: "{{ httpd_www_push_users }}"  
 
 
-- name: Configuring httpd vhost for people
+- name: Configuring httpd vhost for www
   template:
     src: "{{ item }}.j2"
     dest: "/etc/httpd/conf.d/{{ item }}"
@@ -92,4 +95,58 @@
     state: on
   with_items:
     - httpd_can_network_connect
+
+- name: user {{ httpd_www_local_user }} exists
+  user:
+    name: "{{ httpd_www_local_user }}"
+    state: present
+    groups: wwwpush
+
+- name: Wrapper tool to build website
+  template:
+    src: www/centos_website.j2
+    dest: /usr/libexec/centos/centos_website
+    mode: 0750
+    owner: "{{ httpd_www_local_user }}"
+  register: centos_website_script
+  tags:
+    - script
+
+- name: Init podman containers
+  command: /usr/libexec/centos/centos_website init
+  when: centos_website_script is changed
+  become_user: "{{ httpd_www_local_user }}"
+  tags:
+    - script
+
+- name: Cron to compare upstream git
+  cron:
+    name: Build website from git
+    job: /usr/libexec/centos/centos_website build
+    minute: "*/2"
+    user: "{{ httpd_www_local_user }}"
+  tags:
+    - cron
+
+- name: Cron to refresh external content for website
+  cron:
+    name: Refreshing csv files for website
+    job: /usr/libexec/centos/centos_website refresh
+    minute: "25"
+    user: "{{ httpd_www_local_user }}"
+  tags:
+    - cron
+
+- block: 
+    - name: Configuring agent in Zabbix server
+      include_role:
+        name: zabbix-server
+        tasks_from: agent_config
+      vars:
+        zabbix_templates: "{{ httpd_stg_zabbix_templates }}"
+        zabbix_groups: "{{ httpd_zabbix_groups }}"
+  delegate_to: "{{ zabbix_api_srv }}"  
+  tags:
+    - monitoring
+  when: zabbix_api_srv is defined and zabbix_api_srv != 'None'
 

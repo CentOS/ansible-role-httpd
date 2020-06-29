@@ -1,0 +1,111 @@
+#!/bin/bash
+
+#
+# Purposes : renders and publish website from git 
+# Called by: cron
+# Configured by: Ansible, don't edit
+#
+
+action="$1"
+web_servers="{{ httpd_www_servers }}" # servers to push content to
+git_upstream="{{ httpd_www_git_upstream }}" # Where to git clone/pull from
+git_directory="/home/{{ httpd_www_local_user }}/git/"
+logfile="/home/{{ httpd_www_local_user }}/centos_website.log"
+
+function usage() {
+cat << EOF
+You need to call the script like this : $0 -arguments
+Argument can be one of the following:
+ init			: prepares local jekyll container and git initial clone
+ build		: verify upstream git and rebuild if different
+ refresh	: download from external sources content like .csv files to update website
+
+EOF
+}
+
+f_log() {
+   echo "[+] $(date +%Y%m%d-%H:%M) $(basename $0) -> $*" >>$logfile
+}
+
+function init(){
+  test -d ${git_directory} || mkdir -p ${git_directory}
+  pushd ${git_directory} >/dev/null
+  test -d centos.org || git clone ${git_upstream} >> $logfile
+  for i in .jekyll-cache vendor vendor/bundle _site ; do 
+    podman unshare mkdir -p ${git_directory}/centos.org/${i}
+    podman unshare chown -R 1000:1000 ${git_directory}/centos.org/${i}
+  done
+  podman unshare chown -R 1000:1000 ${git_directory}/centos.org/Gemfile.lock
+  podman images |grep -q jekyll || podman run --volume="${git_directory}/centos.org:/srv/jekyll:z" --volume="${git_directory}/centos.org/vendor/bundle:/usr/local/bundle:z" --rm -it jekyll/jekyll bundle update >>$logfile
+popd >/dev/null
+  refresh
+}
+
+function refresh(){
+  pushd ${git_directory}/centos.org/_data >/dev/null
+  for file in full-mirrorlist.csv full-altarchlist.csv ; do
+    f_log "Refreshing content for file $file ..."
+    curl --silent --fail -O https://mirror-status.centos.org/${file}
+    if [ "$?" -ne "0" ] ;then
+      f_log "[ERROR] Issue downloading file https://mirror-status.centos.org/${file}"
+      f_log "Exiting ..."
+      zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
+      exit 1
+    fi 
+  done
+  popd >/dev/null
+  render
+}
+
+function render(){
+  podman run --volume="${git_directory}/centos.org:/srv/jekyll:z" --volume="${git_directory}/centos.org/vendor/bundle:/usr/local/bundle:z" --rm -it jekyll/jekyll jekyll build 2>&1 > /dev/null && cp -r ${git_directory}/centos.org/_site/* /var/www/centos_website/
+  if [ "$?" -eq "0" ] ; then
+  f_log "Rendering status : $?, pushing to www nodes"
+    for node in ${web_servers}; do
+      f_log "Pushing content to $node .."
+      rsync -aH --delete-after /var/www/centos_website/ wwwpush@${node}:/var/www/centos_website/ >/dev/null 2>&1 
+      if [ "$?" -ne "0" ] ; then
+        f_log "[ERROR] Error pushing to target ${node}."
+        f_log "Exiting process"
+        zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
+        exit 1
+      fi 
+    done
+  else
+    f_log "[ERROR] issue detected when building website"
+    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
+  fi
+}
+
+function build(){
+  pushd ${git_directory}/centos.org >/dev/null
+  last_commit=$(git log| head -n 1|awk '{print $2}')
+  git pull >/dev/null
+  current_commit=$(git log| head -n 1|awk '{print $2}')
+  popd >/dev/null
+
+  if [ "${current_commit}" == "${last_commit}" ] ; then
+    f_log "Git head/last commit is equal [${current_commit}]"
+    f_log "Skipping website build and push"
+  else
+    render
+fi
+}
+
+if [ "$action" == "init" ] ; then
+   f_log "Initializing ..."
+   init
+elif [ "$action" ==  "build" ] ; then
+   f_log "Comparing upstream git HEAD and rebuilding if needed"
+   build
+elif [ "$action" ==  "refresh" ] ; then
+  f_log "Refreshing external content and rendering website .."
+  refresh
+else
+  usage
+  exit 1
+fi
+
+# If we made it here, that means all was ok so updating zabbix status
+zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 0 >/dev/null
+
