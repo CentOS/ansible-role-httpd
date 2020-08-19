@@ -12,6 +12,7 @@
   template:
     src: "templates/{{ item }}.j2"
     dest: "/etc/httpd/conf.d/{{ item }}"
+    mode: 0644
   with_items:
     - 01_common.conf
     - welcome.conf
@@ -29,6 +30,7 @@
   template:
     src: header.html.j2
     dest: /var/www/centos-design/header-{{ httpd_html_autoindex_title | lower | replace(" ","-") }}.html
+    mode: 0644
 
 - name: Ensuring httpd service is started
   service: 

@@ -8,6 +8,7 @@
   template:
     src: "docs/{{ item }}.j2"
     dest: "/etc/httpd/conf.d/{{ item }}"
+    mode: 0644
   with_items:
     - 03_docs.conf
     - ssl-docs.conf

@@ -14,6 +14,7 @@
   template:
     src: internal-mirrorlist/index.php.j2
     dest: /var/www/internal-mirrorlist/index.php
+    mode: 0644
   tags:
     - script
 
@@ -21,6 +22,7 @@
   template:
     src: 15_internal-mirrorlist.conf.j2
     dest: /etc/httpd/conf.d/15_internal-mirrorlist.conf
+    mode: 0644
   notify:
     - reload_httpd
 

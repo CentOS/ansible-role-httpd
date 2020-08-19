@@ -15,6 +15,7 @@
   template:
     src: 99_vhost-shared-dir.conf.j2
     dest: "/etc/httpd/conf.d/99_vhost_{{ item.name }}.conf"
+    mode: 0644
   with_items: "{{ httpd_vhost_shared_list }}"  
   notify:
     - restart_httpd

@@ -8,6 +8,7 @@
   template:
     src: "centosproject/{{ item }}.j2"
     dest: "/etc/httpd/conf.d/{{ item }}"
+    mode: 0644
   with_items:
     - 02_centosproject.conf
     - ssl-centosproject.conf

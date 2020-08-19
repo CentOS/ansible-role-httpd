@@ -8,6 +8,7 @@
   template:
     src: templates/ssl.conf.j2
     dest: /etc/httpd/conf.d/ssl.conf
+    mode: 0644
   notify: restart_httpd  
 
 - name: Opening up https fw rule

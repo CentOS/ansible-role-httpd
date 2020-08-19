@@ -12,6 +12,7 @@
   template:
     src: 99_reposnap.conf.j2
     dest: /etc/httpd/conf.d/99_reposnap.conf
+    mode: 0644
   notify:
     - restart_httpd
 

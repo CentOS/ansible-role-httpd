@@ -41,6 +41,7 @@
   template:
     src: people-users.j2
     dest: /var/www/people/users.html
+    mode: 0644
   register: user_list_html
 
 - name: Creating index.html for people vhosts
@@ -51,6 +52,7 @@
   template:
     src: "{{ item }}.j2"
     dest: "/etc/httpd/conf.d/{{ item }}"
+    mode: 0644
   with_items:
     - userdir.conf
     - 02_people.conf
