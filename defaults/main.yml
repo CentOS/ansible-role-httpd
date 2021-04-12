@@ -15,6 +15,25 @@ httpd_maxrequestworkers: 512
 httpd_html_autoindex_title: "CentOS"
 httpd_html_autoindex_content: ""
 
+# Some settings for included apache httpd modules
+# These will be configured system-wide/global and not per vhost
+httpd_mod_qos: False
+# If we have it to True, we can just inject snippet for mod_qos 
+# See http://mod-qos.sourceforge.net/ for possible settings
+httpd_mod_qos_snippet: |
+  QS_Status on
+  QS_MaxClients 500
+  QS_ClientEntries 100000
+  QS_SrvMaxConn 10000
+  QS_SrvMaxConnClose  60%
+  QS_SrvMaxConnPerIP  20
+  QS_ClientEventBlockCount 20 600
+  QS_SetEnvIfStatus        QS_SrvMaxConnPerIP QS_Block
+  QS_SetEnvIfStatus        BrokenConnection   QS_Block
+  QS_SetEnvIfStatus        NullConnection     QS_Block
+
+
+
 # Zabbix monitoring
 httpd_zabbix_templates:
   - Template CentOS http server

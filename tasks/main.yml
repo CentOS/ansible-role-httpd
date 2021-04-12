@@ -67,6 +67,21 @@
 - include_tasks: tls.yml
   when: httpd_tls
 
+
+- block:
+    - name: Ensure we have mod_qos pkg installed
+      yum:
+        name: mod_qos
+        state: latest
+
+    - name: Distributing mod_qos config
+      template:
+        src: 01_qos.conf.j2
+        dest: /etc/httpd/conf.d/01_qos.conf
+      notify:
+        reload_httpd
+  when: httpd_mod_qos
+
 - block: 
     - name: Configuring agent in Zabbix server
       include_role:
