@@ -68,25 +68,12 @@
   tags:
     - config
 
-- name: Script to gather dynamic content
-  template:
-    src: www/content-download.sh.j2
-    dest: /usr/libexec/centos/content-download.sh
-    mode: 0755
-  tags:
-    - cron
-
-- name: Cron to gather content
-  cron:
-    name: Gathering rss and csv files for website
-    job: /usr/libexec/centos/content-download.sh
-    minute: "*/5"
-  tags:
-    - cron
-
 - name: Install some tools to render website locally
   yum:
-    name: ['podman', 'git']
+    name: 
+      - podman
+      - git
+      - python3-feedparser
     state: installed
 
 - name: Enabling needed selinux booleans
@@ -131,7 +118,7 @@
 
 - name: Cron to refresh external content for website
   cron:
-    name: Refreshing csv files for website
+    name: Refreshing csv and rss files for website
     job: /usr/libexec/centos/centos_website refresh
     minute: "25"
     user: "{{ httpd_www_local_user }}"

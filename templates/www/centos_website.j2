@@ -51,8 +51,16 @@ function refresh(){
       f_log "Exiting ..."
       zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
       exit 1
-    fi 
-  done
+    fi
+  done 
+  test -d centos || mkdir -p centos     
+  /usr/libexec/centos/rss2json.py -i https://planet.centos.org/rss20.xml -o centos/planet.json
+  if [ "$?" -ne "0" ] ;then
+    f_log "[ERROR] Issue refreshing rss feed from planet.centos.org"
+    f_log "Exiting ..."
+    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
+    exit 1
+  fi 
   popd >/dev/null
   render
 }

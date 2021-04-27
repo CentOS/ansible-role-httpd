@@ -1,15 +1,5 @@
 #!/bin/bash
 
-#
-# Updated script to get rss feed from planet.centos.org 
-#
-pushd /var/tmp
-curl --silent --fail -O https://planet.centos.org/rss20.xml 
-if [ "$?" = "0" ] ; then
-  /bin/cp /var/tmp/rss20.xml {{ httpd_www_rootdir }}/assets/planet.rss
-else
- logger "unable to download planet feeds"
-fi
-popd
+/bin/true
 
 
