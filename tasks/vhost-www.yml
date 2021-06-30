@@ -2,7 +2,7 @@
     name: httpd
     tasks_from: pki-tls
   vars:
-    pki_hostname: www.centos.org
+    pki_hostname: "{{ httpd_www_hostname }}"
 
 - name: Ensuring that scponly is installed for specific shell
   yum:
