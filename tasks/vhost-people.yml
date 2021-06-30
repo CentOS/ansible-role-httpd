@@ -2,7 +2,7 @@
     name: httpd
     tasks_from: pki-tls
   vars:
-    pki_hostname: people.centos.org
+    pki_hostname: "{{ httpd_people_hostname }}"
 
 - name: Merging admins and local users list
   set_fact:

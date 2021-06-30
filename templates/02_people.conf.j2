@@ -1,7 +1,7 @@
 <VirtualHost *:80>
-  ServerName people.centos.org
-  CustomLog logs/people.centos.org_access.log combined
-  ErrorLog logs/people.centos.org_error.log
+  ServerName {{ httpd_people_hostname }}
+  CustomLog logs/{{ httpd_people_hostname }}_access.log combined
+  ErrorLog logs/{{ httpd_people_hostname }}_error.log
   DocumentRoot /var/www/people
   # Global for each user directory
 
