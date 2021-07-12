@@ -2,7 +2,7 @@
     name: httpd
     tasks_from: pki-tls
   vars:
-    pki_hostname: "{{ httpd_people_hostname }}"
+    pki_hostname: "{{ httpd_www_hostname }}"
 
 - name: Merging admins and local users list
   set_fact:
@@ -33,20 +33,45 @@
 
 - name: Creating DocumentRoot for people vhost
   file:
-    path: /var/www/people
+    path: "{{ httpd_autoindex_people_directory }}"
     state: directory
     mode: 0755
 
-- name: Creating users list for people vhost
-  template:
-    src: people-users.j2
-    dest: /var/www/people/users.html
-    mode: 0644
-  register: user_list_html
+- name: Creating autoindex directory structure
+  ansible.builtin.file:
+    path: "{{ httpd_autoindex_directory }}/{{ item.template }}-{{ item.title | replace(' ', '-') | lower }}"
+    state: directory
+    mode: "755"
+  loop: "{{ httpd_autoindex_pages }}"
 
-- name: Creating index.html for people vhosts
-  shell: cat /var/www/centos-design/header-{{ httpd_html_autoindex_title | lower | replace(" ","-") }}.html /var/www/people/users.html /var/www/centos-design/footer.html > /var/www/people/index.html
-  when: user_list_html is changed
+- name: Creating page not found file
+  template:
+    src: "autoindex/404.html.j2"
+    dest: "{{ httpd_autoindex_directory }}/404.html"
+
+- name: Creating people index file
+  template:
+    src: "autoindex/header-centos-people-index.html.j2"
+    dest: "{{ httpd_autoindex_people_directory }}/index.html"
+
+- name: Creating people HEADER.html files
+  template:
+    src: "autoindex/header-{{ item.template }}.html.j2"
+    dest: "{{ httpd_autoindex_directory }}/{{ item.template }}-{{ item.title | replace(' ', '-') | lower }}/HEADER.html"
+  when: item.template == "centos-people"
+  loop: "{{ httpd_autoindex_pages }}"
+
+- name: Creating HEADER.html files
+  template:
+    src: "autoindex/header-{{ item.template }}.html.j2"
+    dest: "{{ httpd_autoindex_directory }}/{{ item.template }}-{{ item.title | replace(' ', '-') | lower }}/HEADER.html"
+  when: item.template == "centos"
+  loop: "{{ httpd_autoindex_pages }}"
+
+- name: Creating README.html
+  template:
+    src: "autoindex/footer.html.j2"
+    dest: "{{ httpd_autoindex_directory }}/README.html"
 
 - name: Configuring httpd vhost for people
   template:

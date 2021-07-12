@@ -14,9 +14,10 @@ NameVirtualHost *:80
 # Default Header
 Alias /header /var/www/centos/header
 Alias /centos-design /var/www/centos-design
+Alias {{ httpd_autoindex_alias }} {{ httpd_autoindex_directory }}
 
 # Some customized ErrorDocument files
-ErrorDocument 404 /centos-design/404.html
+ErrorDocument 404 {{ httpd_autoindex_alias }}/404.html
 
 # Prefork tuning
 <IfModule mpm_prefork_module>

@@ -1,7 +1,7 @@
 <VirtualHost *:80>
-  ServerName {{ httpd_people_hostname }}
-  CustomLog logs/{{ httpd_people_hostname }}_access.log combined
-  ErrorLog logs/{{ httpd_people_hostname }}_error.log
+  ServerName {{ httpd_www_hostname }}
+  CustomLog logs/{{ httpd_www_hostname }}_access.log combined
+  ErrorLog logs/{{ httpd_www_hostname }}_error.log
   DocumentRoot /var/www/people
   # Global for each user directory
 
@@ -22,4 +22,3 @@
   RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
 
 </VirtualHost>
-

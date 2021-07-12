@@ -1,5 +1,6 @@
 <VirtualHost *:443>
-DocumentRoot "/var/www/people"
+  ServerName "{{ httpd_www_hostname }}"
+  DocumentRoot "{{ httpd_autoindex_people_directory }}"
 
   Header always set Strict-Transport-Security "max-age=31536000"
   Header always set X-Xss-Protection "1; mode=block"
@@ -9,50 +10,42 @@ DocumentRoot "/var/www/people"
 
   RewriteEngine On
   RewriteCond $1 !^.well-known
-  RewriteCond      %{REQUEST_URI} ^/([^/]+)
+  RewriteCond %{REQUEST_URI} ^/([^/]+)
   RewriteCond /home/%1 -d
   RewriteRule ^/([^/]+)(.*) /home/$1/public_html/$2
 
-  HeaderName /centos-design/header.html
-  ReadmeName /centos-design/footer.html
-  # Global for each user directory
-  IndexOptions +SuppressHTMLPreamble NameWidth=*
-  IndexStyleSheet "/centos-design/css/centos-listindex.css"
-
-  <Directory "/var/www/people">
-    Options Indexes FollowSymLinks
-    <IfVersion < 2.4>
-    Order allow,deny
-    Allow from all
-    </IfVersion>
-    <IfVersion >= 2.4>
-    IndexOptions +SuppressHTMLPreamble NameWidth=*
-    IndexStyleSheet "/centos-design/css/centos-listindex.css"
+  Alias "{{ httpd_autoindex_alias }}" "{{ httpd_autoindex_directory }}"
+  <Directory "{{ httpd_autoindex_directory }}">
+    AllowOverride None
     Require all granted
-    </IfVersion>
   </Directory>
 
-ErrorLog logs/ssl-{{ httpd_people_hostname }}_error.log
-TransferLog logs/ssl-{{ httpd_people_hostname }}_access.log
-LogLevel warn
-SSLEngine on
-SSLHonorCipherOrder on
-SSLProtocol all -SSLv2 -SSLv3
-SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW:!aNULL:!eNULL:!DES:!MD5:!PSK:!RC4
-SSLCertificateFile /etc/pki/tls/certs/{{ httpd_people_hostname }}.crt
-SSLCertificateKeyFile /etc/pki/tls/private/{{ httpd_people_hostname }}.key
-SSLCertificateChainFile /etc/pki/tls/certs/{{ httpd_people_hostname }}-CAChain.crt
-<Files ~ "\.(cgi|shtml|phtml|php3?)$">
-    SSLOptions +StdEnvVars
-</Files>
-<Directory "/var/www/cgi-bin">
-    SSLOptions +StdEnvVars
-</Directory>
-SetEnvIf User-Agent ".*MSIE.*" \
-         nokeepalive ssl-unclean-shutdown \
-         downgrade-1.0 force-response-1.0
-CustomLog logs/ssl-seven.centos.org_request.log \
-          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
-</VirtualHost>                               
+  ReadmeName {{ httpd_autoindex_alias }}/README.html
 
+  ErrorLog logs/ssl-{{ httpd_www_hostname }}_error.log
+  TransferLog logs/ssl-{{ httpd_www_hostname }}_access.log
+  LogLevel warn
 
+  SSLEngine on
+  SSLHonorCipherOrder on
+  SSLProtocol all -SSLv2 -SSLv3
+  SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW:!aNULL:!eNULL:!DES:!MD5:!PSK:!RC4
+
+  SSLCertificateFile /etc/pki/tls/certs/{{ httpd_www_hostname }}.crt
+  SSLCertificateKeyFile /etc/pki/tls/private/{{ httpd_www_hostname }}.key
+  SSLCertificateChainFile /etc/pki/tls/certs/{{ httpd_www_hostname }}-CAChain.crt
+
+  <Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+  </Files>
+
+  <Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+  </Directory>
+
+  SetEnvIf User-Agent ".*MSIE.*" \
+    nokeepalive ssl-unclean-shutdown \
+    downgrade-1.0 force-response-1.0
+  CustomLog logs/ssl-seven.centos.org_request.log \
+    "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>

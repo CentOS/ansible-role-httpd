@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Page not found</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ httpd_autoindex_siteurl }}/assets/img/favicon.png">
+    <link rel="stylesheet" href="{{ httpd_autoindex_siteurl }}/assets/css/centos.bootstrap.min.css">
+  </head>
+  <body>
+    {% include "autoindex/header-centos-navbar.html.j2" %}
+    <header class="header header__page">
+      <h1 class="header__page__title">404</h1>
+      <p class="header__page__description">Page not found :(</p>
+    </header>
+    <main class="page">
+      <article class="page__content">
+        <div class="page__content__nav">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ httpd_autoindex_siteurl }}">Home</a></li>
+            <li class="breadcrumb-item">Page not found</li>
+          </ol>
+        </div>
+        <div class="page__content">
+
+        <p>The requested page could not be found.</p>
+
+        <p>This happens when the page has been moved, removed, or had its name and address changed. It might otherwise be temporarily unavailable for technical reasons.</p>
+
+{% include "autoindex/footer.html.j2" %}

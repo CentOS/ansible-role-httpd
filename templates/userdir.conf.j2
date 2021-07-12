@@ -29,8 +29,19 @@
 # for a site where these directories are restricted to read-only.
 #
 <Directory "/home/*/public_html">
-    IndexOptions NameWidth=* +SuppressHTMLPreamble
+    IndexOptions FancyIndexing -HTMLTable VersionSort SuppressHTMLPreamble XHTML
     AllowOverride FileInfo AuthConfig Limit Indexes
     Options MultiViews Indexes SymLinksIfOwnerMatch IncludesNoExec
     Require method GET POST OPTIONS
+    Require all granted
 </Directory>
+#
+# Apply personalized headers for users.
+#
+{% for item in httpd_autoindex_pages %}
+{% if item.template == "centos-people" %}
+  <Directory "/home/{{ item.title }}/public_html">
+      HeaderName {{ httpd_autoindex_alias }}/{{ item.template }}-{{ item.title }}/HEADER.html
+  </Directory>
+{% endif %}
+{% endfor %}

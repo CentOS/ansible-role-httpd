@@ -32,8 +32,6 @@ httpd_mod_qos_snippet: |
   QS_SetEnvIfStatus        BrokenConnection   QS_Block
   QS_SetEnvIfStatus        NullConnection     QS_Block
 
-
-
 # Zabbix monitoring
 httpd_zabbix_templates:
   - Template CentOS http server
@@ -45,7 +43,6 @@ httpd_tls_zabbix_templates:
 httpd_tls_zabbix_groups:
   - CentOS HTTPS servers
 
-
 # For reposnap task
 reposnap_local_dir: /srv/reposnap
 reposnap_rsync_from: msync.centos.org::centos/
@@ -53,14 +50,10 @@ reposnap_rsync_from: msync.centos.org::centos/
 # For SCL php task
 scl_php_ver: 73
 
-# For docs-infra task, used to render docs.infra.centos.org content
-httpd_docs_infra_user: centos
-httpd_docs_infra_rootdir: /var/www/docs.infra
-httpd_docs_infra_hostname: docs.infra.centos.org
-
 # For www task
 httpd_www_rootdir: /var/www/centos_website
 httpd_www_hostname: www.centos.org
+httpd_www_domain: centos.org
 httpd_www_aliases: 
   - centos.org
 httpd_www_push_users:
@@ -76,13 +69,271 @@ httpd_www_servers: "web1.test.centos.org web2.test.centos.org"
 httpd_stg_zabbix_templates:
   - Template CentOS website render
 
+# CentOS vhosts allowed to consume shared resources from CentOS main website
+# (e.g., css and js files). See
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+httpd_www_cors: []
+
 httpd_www_snippet: |
   # This is a snippet block coming from ansible inventory
-
 
 # For internal-mirrorlist task
 # FQDN of internal mirror we want to redirect yum/dnf clients to
 httpd_mirrorlist_internal_url: mirror.centos.org
 
-# For vhost-people task
-httpd_people_hostname: people.centos.org
+#
+# Autoindex
+#
+# Variables to implement autoindex pages.  The autoindex templates provide
+# optional alerts and paragraphs on top of the file list that. By changing this
+# variables you can change the content of autoindex pages.
+#
+# E.g.,
+# ----------------------------------------------------------------------
+#- title: "nickname1"
+#  title_lead: "Full Name 1"
+#  manifestation: "People"
+#  alerts:
+#    - title: '<i class="fas fa-info-circle"></i> Primary:'
+#      class: "alert alert-primary"
+#      message: "This is a primary alert-check it out!"
+#    - title: '<i class="fas fa-info-circle"></i> Secondary:'
+#      class: "alert alert-secondary"
+#      message: "This is a secondary alert-check it out!"
+#    - title: '<i class="fas fa-check-circle"></i> Success:'
+#      class: "alert alert-success"
+#      message: "This is a success alert-check it out!"
+#    - title: '<i class="fas fa-exclamation-triangle"></i> Danger:'
+#      class: "alert alert-danger"
+#      message: "This is a danger alert-check it out!"
+#    - title: '<i class="fas fa-exclamation-triangle"></i> Warning:'
+#      class: "alert alert-warning"
+#      message: "This is a warning alert-check it out!"
+#    - title: '<i class="fas fa-info-circle"></i> Info:'
+#      class: "alert alert-info"
+#      message: "This is a info alert-check it out!"
+#  paragraphs:
+#    - "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fringilla sapien vitae viverra finibus. Donec laoreet sapien eget erat efficitur, id fringilla sem pretium. Proin vitae ex at ex aliquam vehicula. Vestibulum in orci sem. Proin suscipit pretium mauris in semper. Suspendisse leo turpis, facilisis ac facilisis ac, vehicula sit amet urna. Nam pharetra libero mi, ac sagittis quam ultrices quis."
+#    - "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fringilla sapien vitae viverra finibus. Donec laoreet sapien eget erat efficitur, id fringilla sem pretium. Proin vitae ex at ex aliquam vehicula. Vestibulum in orci sem. Proin suscipit pretium mauris in semper. Suspendisse leo turpis, facilisis ac facilisis ac, vehicula sit amet urna. Nam pharetra libero mi, ac sagittis quam ultrices quis."
+#  template: centos-people
+# ----------------------------------------------------------------------
+# Set the directory where people index.html will be stored in.
+httpd_autoindex_people_directory: "/var/www/people"
+
+# Set the HTTP alias that will be used to access autoindex files.
+httpd_autoindex_alias: "/common"
+
+# Set the directory where autoindex files will be stored.
+httpd_autoindex_directory: "/var/www/people"
+
+# Set the site's base URL (without trailing slash) were CSS and image files
+# will be retrieved from. This is normally "https://www.centos.org". So, when
+# we change the main site design, all other sites based on it will be changed
+# as well and no need to maintain separated files.
+httpd_autoindex_siteurl: "https://www.centos.org"
+
+# Set the list of autoindex pages and their content. This list is also used to
+# build index pages with group information.
+httpd_autoindex_pages:
+  #
+  # debuginfo.centos.org
+  #
+  - title: "Debuginfo"
+    title_lead: ""
+    manifestation: ""
+    alerts:
+      - class: "alert alert-danger"
+        title: '<i class="fas fa-exclamation-triangle"></i>'
+        message: |
+          Due to lack of available bandwidth, we currently don't offer rsync to
+          download/synchronize content from centos.org for debuginfo pkgs.
+          Also worth knowing that this mirror is running on limited available
+          bandwidth too.
+    paragraphs:
+      - "The following external mirrors (not monitored by the CentOS Infra team!) provide direct downloads for debuginfo packages, through http and/or rsync:"
+      - '<i class="fas fa-server"></i> mirror.facebook.net (<a ref="http://mirror.facebook.net/centos-debuginfo">HTTP</a> | <a href="rsync://mirror.facebook.net/centos-debuginfo">RSYNC</a>)'
+      - '<i class="fas fa-server"></i> linuxsoft.cern.ch (<a href="http://linuxsoft.cern.ch/centos-debuginfo">HTTP</a> | <a href="rsync://linuxsoft.cern.ch/centos-debuginfo">RSYNC</a>)'
+    template: centos
+  #
+  # mirror.centos.org
+  #
+  - title: "Mirror"
+    title_lead: |
+      This directory tree contains current CentOS Linux and Stream releases.
+    manifestation: ""
+    alerts:
+      - class: "alert alert-info"
+        title: '<i class="fas fa-info-circle"></i> Note:'
+        message: |
+          For archived content, see <a href="http://vault.centos.org/">Vault mirror</a>.
+      - class: "alert alert-info"
+        title: '<i class="fas fa-info-circle"></i> Note:'
+        message: |
+          For debuginfo packages, see <a href="http://debuginfo.centos.org/">Debuginfo mirror</a>.
+    paragraphs: []
+    template: centos
+  #
+  # www.centos.org/minutes/
+  #
+  - title: "Meeting minutes"
+    title_lead: "This directory tree contains the archived CentOS meetings minutes, ordered by year/month."
+    manifestation: ""
+    alerts: []
+    paragraphs: []
+    template: centos
+  #
+  # people.centos.org/<nickname>/
+  #
+  - title: "toracat"
+    title_lead: "Akemi Yagi"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "areguera"
+    title_lead: "Alain Reguera Delgado"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "tobisna"
+    title_lead: "Ansible CentOS infra automation bot"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "avij"
+    title_lead: "Anssi Johansson"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "bstinson"
+    title_lead: "Brian Stinson"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "carlwgeorge"
+    title_lead: "Carl George"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "tigalch"
+    title_lead: "Christoph Galuschka"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "Fabian Arrotin"
+    title_lead: "arrfab"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "jpoc"
+    title_lead: "James O'Connor"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "jperrin"
+    title_lead: "Jim Perrin"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "jrd"
+    title_lead: "John R Dennison"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "hughesjr"
+    title_lead: "Johnny Hughes"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "z00dax"
+    title_lead: "Karanbir Singh"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "lpancescu"
+    title_lead: "Laurențiu Păncescu"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "pgreco"
+    title_lead: "Pablo Greco"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "pasik"
+    title_lead: "Pasi Karkkainen"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "range"
+    title_lead: "Ralph Angenendt"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "rbowen"
+    title_lead: "Rich Bowen"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "smooge"
+    title_lead: "Stephen Smoogen"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "alphacc"
+    title_lead: "Thomas Oulevey"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "trevorh"
+    title_lead: "Trevor Hemsley"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people
+
+  - title: "tru"
+    title_lead: "Tru Huynh"
+    manifestation: "People"
+    alerts: []
+    paragraphs: []
+    template: centos-people

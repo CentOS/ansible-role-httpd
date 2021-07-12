@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>{{ item.title }} | CentOS People</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ httpd_autoindex_siteurl }}/assets/img/favicon.png">
+    <link rel="stylesheet" href="{{ httpd_autoindex_siteurl }}/assets/css/centos-httpd.bootstrap.min.css">
+  </head>
+  <body>
+    {% include "autoindex/header-centos-navbar.html.j2" %}
+    <header class="header header__page">
+      <h1 class="header__page__title">{{ item.title }}</h1>
+      <p class="header__page__description">{{ item.title_lead }}</p>
+    </header>
+    <main class="page">
+      <article class="page__content">
+        <div class="page__content__nav">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ httpd_autoindex_siteurl }}/">Home</a></li>
+            <li class="breadcrumb-item"><a href="https://{{ httpd_www_hostname }}/">People</a></li>
+            <li class="breadcrumb-item">{{ item.title }}</li>
+          </ol>
+        </div>
+        <div class="page__content__autoindex">
+{% for i in item.alerts %}
+          <div class="{{ i.class }}" role="alert">
+            <strong>{{ i.title }}</strong> {{ i.message }}
+          </div>
+{% endfor %}
+
+{% for i in item.paragraphs %}
+          <p>{{ i }}</p>
+{% endfor %}

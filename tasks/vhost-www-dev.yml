@@ -1,0 +1,38 @@
+- name: Ensuring we have a DocumentRoot
+  file:
+    path: "/var/www/centos_website/"
+    state: directory
+    owner: '{{ item.login_name }}'
+    group: '{{ item.login_name }}'
+    mode: 0775
+  with_items: "{{ httpd_www_push_users }}"
+
+- name: Configuring httpd vhost for www
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/httpd/conf.d/{{ item }}"
+    mode: 0644
+    backup: true
+  with_items:
+    - 02_vhost-www.conf
+    - ssl-vhost-www.conf
+  notify:
+    - reload_httpd
+  tags:
+    - config
+
+- name: Install some tools to render website locally
+  yum:
+    name: 
+      - podman
+      - git
+      - python3-feedparser
+    state: installed
+
+- name: Enabling needed selinux booleans
+  seboolean:
+    name: "{{ item }}"
+    persistent: yes
+    state: on
+  with_items:
+    - httpd_can_network_connect
