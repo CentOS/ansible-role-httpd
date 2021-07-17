@@ -11,18 +11,20 @@ NameVirtualHost *:80
      ProxyPass "http://cephas.centos.org/.well-known/acme-challenge/"
  </Location>
 
-# Default Header
-Alias /header /var/www/centos/header
-Alias /centos-design /var/www/centos-design
-Alias {{ httpd_autoindex_alias }} {{ httpd_autoindex_directory }}
-
-# Some customized ErrorDocument files
-ErrorDocument 404 {{ httpd_autoindex_alias }}/404.html
-
 # Prefork tuning
 <IfModule mpm_prefork_module>
     ServerLimit               {{ httpd_maxrequestworkers * 1.5 }}
     MaxRequestWorkers         {{ httpd_maxrequestworkers }}
     MaxConnectionsPerChild    {{ httpd_maxrequestworkers * 5 }}
 </IfModule>
+
+# Alias to common resources
+Alias "{{ httpd_autoindex_alias }}" "{{ httpd_autoindex_directory }}"
+<Directory "{{ httpd_autoindex_directory }}">
+  AllowOverride None
+  Require all granted
+</Directory>
+
+# Customized ErrorDocument files
+ErrorDocument 404 {{ httpd_autoindex_alias }}/404.html
 

@@ -14,12 +14,6 @@
   RewriteCond /home/%1 -d
   RewriteRule ^/([^/]+)(.*) /home/$1/public_html/$2
 
-  Alias "{{ httpd_autoindex_alias }}" "{{ httpd_autoindex_directory }}"
-  <Directory "{{ httpd_autoindex_directory }}">
-    AllowOverride None
-    Require all granted
-  </Directory>
-
   ReadmeName {{ httpd_autoindex_alias }}/README.html
 
   ErrorLog logs/ssl-{{ httpd_www_hostname }}_error.log

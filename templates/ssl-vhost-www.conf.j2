@@ -10,7 +10,7 @@
   Header always set Referrer-Policy "same-origin"
 
 {% for origin in httpd_www_cors %}
-  Header set Access-Control-Allow-Origin "{{ origin }}.{{ httpd_www_domain }}"
+  Header set Access-Control-Allow-Origin "{{ origin }}"
 {% endfor %}
 
   RewriteEngine on
