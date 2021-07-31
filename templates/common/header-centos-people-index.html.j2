@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>CentOS People</title>
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ httpd_autoindex_siteurl }}/assets/img/favicon.png">
-    <link rel="stylesheet" href="{{ httpd_autoindex_siteurl }}/assets/css/centos-httpd.bootstrap.min.css">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ httpd_assets_url }}/assets/img/favicon.png">
+    <link rel="stylesheet" href="{{ httpd_assets_url }}/assets/css/centos-httpd.bootstrap.min.css">
   </head>
   <body>
-    {% include "autoindex/header-centos-navbar.html.j2" %}
+    {% include "common/header-centos-navbar.html.j2" %}
     <header class="header header__page">
       <h1 class="header__page__title">People</h1>
       <p class="header__page__description">This is an area where the CentOS
@@ -17,11 +17,17 @@
       into CentOS, CentOS Extras and/or CentOS Plus ... while other things may
       not.</p>
     </header>
+    <div class="hr">
+    <div class="hr__centos-color-0"></div>
+    <div class="hr__centos-color-1"></div>
+    <div class="hr__centos-color-2"></div>
+    <div class="hr__centos-color-3"></div>
+    </div>
     <main class="page">
       <article class="page__content">
         <div class="page__content__nav">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ httpd_autoindex_siteurl }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ httpd_assets_url }}">Home</a></li>
             <li class="breadcrumb-item">People</li>
           </ol>
         </div>
@@ -34,11 +40,11 @@
         <p>The following users currently have areas on people.centos.org (sorted by First name):</p>
 
         <ul class="page__content__autoindex__list">
-{% for i in httpd_autoindex_pages %}
+{% for i in httpd_people_pages %}
 {% if i.template == "centos-people" %}
           <li><a href="/{{ i.title }}">{{ i.title_lead }} ({{ i.title }})</a></li>
 {% endif %}
 {% endfor %}
         </ul>
 
-{% include "autoindex/footer.html.j2" %}
+{% include "common/footer.html.j2" %}

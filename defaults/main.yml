@@ -18,6 +18,7 @@ httpd_html_autoindex_content: ""
 # Some settings for included apache httpd modules
 # These will be configured system-wide/global and not per vhost
 httpd_mod_qos: False
+
 # If we have it to True, we can just inject snippet for mod_qos 
 # See http://mod-qos.sourceforge.net/ for possible settings
 httpd_mod_qos_snippet: |
@@ -35,6 +36,7 @@ httpd_mod_qos_snippet: |
 # Zabbix monitoring
 httpd_zabbix_templates:
   - Template CentOS http server
+
 httpd_zabbix_groups:
   - CentOS HTTP servers
 
@@ -69,271 +71,205 @@ httpd_www_servers: "web1.test.centos.org web2.test.centos.org"
 httpd_stg_zabbix_templates:
   - Template CentOS website render
 
-# CentOS vhosts allowed to consume shared resources from CentOS main website
-# (e.g., css and js files). See
-# https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-httpd_www_cors: []
-
 httpd_www_snippet: |
   # This is a snippet block coming from ansible inventory
 
-# For internal-mirrorlist task
-# FQDN of internal mirror we want to redirect yum/dnf clients to
+
+# ===============================================================================
+# httpd_www_cors - Set Cross-Origin Resource Sharing (CORS)
+#
+# Setting CORS allows different CentOS origin domains to consume common
+# resources (e.g., css and js files) from CentOS main website.
+#
+# CAUTION: When one IP address responds to more than one domain name it is
+# difficult to secure the cross-origing requests if the reverse lookup returns
+# a domain name different from the one requesting the resource (e.g.,
+# blog.dev.centos.org requests to www.dev.centos.org seems to come from
+# people.dev.centos.org instead of blog.dev.centos.org).
+#
+# See https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+# ===============================================================================
+httpd_www_cors:
+  - "*"
+
+
+# ===============================================================================
+# httpd_mirrorlist_internal_url -
+# ===============================================================================
+# For internal-mirrorlist task FQDN of internal mirror we want to redirect
+# yum/dnf clients to.
 httpd_mirrorlist_internal_url: mirror.centos.org
 
+
+# ===============================================================================
+# httpd_common_alias - Set http alias to common http resources
 #
-# Autoindex
+# This is the location that will be used in the ErrorDocument directive to
+# refer CentOS customized 404 page. Also, it will be used to refer customized
+# autoindex header and footer files necessary on both people and services
+# specific sites.
+# ===============================================================================
+httpd_common_alias: "/common"
+
+
+# ==============================================================================
+# httpd_common_directory - Set directory path to common http resources
 #
-# Variables to implement autoindex pages.  The autoindex templates provide
-# optional alerts and paragraphs on top of the file list that. By changing this
-# variables you can change the content of autoindex pages.
+# Common resources include files like 404.html, and autoindex pages specific to
+# people and services.
+# ==============================================================================
+httpd_common_directory: "/var/www/common"
+
+
+# ===============================================================================
+# httpd_assets_url - Set assets url (without trailing slash).
 #
-# E.g.,
-# ----------------------------------------------------------------------
-#- title: "nickname1"
-#  title_lead: "Full Name 1"
-#  manifestation: "People"
-#  alerts:
-#    - title: '<i class="fas fa-info-circle"></i> Primary:'
-#      class: "alert alert-primary"
-#      message: "This is a primary alert-check it out!"
-#    - title: '<i class="fas fa-info-circle"></i> Secondary:'
-#      class: "alert alert-secondary"
-#      message: "This is a secondary alert-check it out!"
-#    - title: '<i class="fas fa-check-circle"></i> Success:'
-#      class: "alert alert-success"
-#      message: "This is a success alert-check it out!"
-#    - title: '<i class="fas fa-exclamation-triangle"></i> Danger:'
-#      class: "alert alert-danger"
-#      message: "This is a danger alert-check it out!"
-#    - title: '<i class="fas fa-exclamation-triangle"></i> Warning:'
-#      class: "alert alert-warning"
-#      message: "This is a warning alert-check it out!"
-#    - title: '<i class="fas fa-info-circle"></i> Info:'
-#      class: "alert alert-info"
-#      message: "This is a info alert-check it out!"
-#  paragraphs:
-#    - "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fringilla sapien vitae viverra finibus. Donec laoreet sapien eget erat efficitur, id fringilla sem pretium. Proin vitae ex at ex aliquam vehicula. Vestibulum in orci sem. Proin suscipit pretium mauris in semper. Suspendisse leo turpis, facilisis ac facilisis ac, vehicula sit amet urna. Nam pharetra libero mi, ac sagittis quam ultrices quis."
-#    - "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fringilla sapien vitae viverra finibus. Donec laoreet sapien eget erat efficitur, id fringilla sem pretium. Proin vitae ex at ex aliquam vehicula. Vestibulum in orci sem. Proin suscipit pretium mauris in semper. Suspendisse leo turpis, facilisis ac facilisis ac, vehicula sit amet urna. Nam pharetra libero mi, ac sagittis quam ultrices quis."
-#  template: centos-people
-# ----------------------------------------------------------------------
-# Set the directory where people index.html will be stored in.
-httpd_autoindex_people_directory: "/var/www/people"
+# Here is were css, images and js files will be retrieved from. This is
+# normally "https://www.centos.org" in production and
+# "https://www.dev.centos.org" in development. When we change the main site
+# design all other sites based on it will be changed as well and there won't be
+# necessary to maintain separated files. In order for this to work, origin
+# domains must be specified in httpd_www_cors option.
+#
+# This variable should be defined in a high scope location (e.g., under
+# `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
+# playbooks you run can take advantage of it reducing the number of places you
+# need to change.
+# ===============================================================================
+httpd_assets_url: "https://www.centos.org"
 
-# Set the HTTP alias that will be used to access autoindex files.
-httpd_autoindex_alias: "/common"
 
-# Set the directory where autoindex files will be stored.
-httpd_autoindex_directory: "/var/www/people"
-
-# Set the site's base URL (without trailing slash) were CSS and image files
-# will be retrieved from. This is normally "https://www.centos.org". So, when
-# we change the main site design, all other sites based on it will be changed
-# as well and no need to maintain separated files.
-httpd_autoindex_siteurl: "https://www.centos.org"
-
-# Set the list of autoindex pages and their content. This list is also used to
-# build index pages with group information.
-httpd_autoindex_pages:
-  #
-  # debuginfo.centos.org
-  #
-  - title: "Debuginfo"
-    title_lead: ""
-    manifestation: ""
+# ===============================================================================
+# httpd_people_pages - Set customized autoindex pages.
+#
+# Here we control the information autoindex pages will show in both header and
+# footer. It is limited to alerts first and paragraphs later in that order and
+# mixing them is not possible presently. The page presentation is controlled by
+# a template name, "centos-people" for user-specific pages, and "centos" for
+# service-specific. The main different between these templates is the
+# navigation breadcrumbs. The "centos-people" template provides a link to
+# people's index page while "centos" template doesn't.
+# ===============================================================================
+httpd_people_pages:
+  - title: "nickname1"
+    title_lead: "Full Name 1"
+    manifestation: "People"
     alerts:
-      - class: "alert alert-danger"
-        title: '<i class="fas fa-exclamation-triangle"></i>'
-        message: |
-          Due to lack of available bandwidth, we currently don't offer rsync to
-          download/synchronize content from centos.org for debuginfo pkgs.
-          Also worth knowing that this mirror is running on limited available
-          bandwidth too.
-    paragraphs:
-      - "The following external mirrors (not monitored by the CentOS Infra team!) provide direct downloads for debuginfo packages, through http and/or rsync:"
-      - '<i class="fas fa-server"></i> mirror.facebook.net (<a ref="http://mirror.facebook.net/centos-debuginfo">HTTP</a> | <a href="rsync://mirror.facebook.net/centos-debuginfo">RSYNC</a>)'
-      - '<i class="fas fa-server"></i> linuxsoft.cern.ch (<a href="http://linuxsoft.cern.ch/centos-debuginfo">HTTP</a> | <a href="rsync://linuxsoft.cern.ch/centos-debuginfo">RSYNC</a>)'
-    template: centos
-  #
-  # mirror.centos.org
-  #
-  - title: "Mirror"
-    title_lead: |
-      This directory tree contains current CentOS Linux and Stream releases.
-    manifestation: ""
-    alerts:
-      - class: "alert alert-info"
-        title: '<i class="fas fa-info-circle"></i> Note:'
-        message: |
-          For archived content, see <a href="http://vault.centos.org/">Vault mirror</a>.
-      - class: "alert alert-info"
-        title: '<i class="fas fa-info-circle"></i> Note:'
-        message: |
-          For debuginfo packages, see <a href="http://debuginfo.centos.org/">Debuginfo mirror</a>.
-    paragraphs: []
-    template: centos
-  #
-  # www.centos.org/minutes/
-  #
-  - title: "Meeting minutes"
-    title_lead: "This directory tree contains the archived CentOS meetings minutes, ordered by year/month."
-    manifestation: ""
-    alerts: []
-    paragraphs: []
-    template: centos
-  #
-  # people.centos.org/<nickname>/
-  #
-  - title: "toracat"
-    title_lead: "Akemi Yagi"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
+      - title: '<i class="fas fa-info-circle"></i> Primary:'
+        class: "alert alert-primary"
+        message: "This is a primary alert-check it out!"
+      - title: '<i class="fas fa-info-circle"></i> Secondary:'
+        class: "alert alert-secondary"
+        message: "This is a secondary alert-check it out!"
+      - title: '<i class="fas fa-check-circle"></i> Success:'
+        class: "alert alert-success"
+        message: "This is a success alert-check it out!"
+      - title: '<i class="fas fa-exclamation-triangle"></i> Danger:'
+        class: "alert alert-danger"
+        message: "This is a danger alert-check it out!"
+      - title: '<i class="fas fa-exclamation-triangle"></i> Warning:'
+        class: "alert alert-warning"
+        message: "This is a warning alert-check it out!"
+      - title: '<i class="fas fa-info-circle"></i> Info:'
+        class: "alert alert-info"
+        message: "This is a info alert-check it out!"
+        paragraphs:
+          - "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fringilla sapien vitae viverra finibus. Donec laoreet sapien eget erat efficitur, id fringilla sem pretium. Proin vitae ex at ex aliquam vehicula. Vestibulum in orci sem. Proin suscipit pretium mauris in semper. Suspendisse leo turpis, facilisis ac facilisis ac, vehicula sit amet urna. Nam pharetra libero mi, ac sagittis quam ultrices quis."
+          - "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fringilla sapien vitae viverra finibus. Donec laoreet sapien eget erat efficitur, id fringilla sem pretium. Proin vitae ex at ex aliquam vehicula. Vestibulum in orci sem. Proin suscipit pretium mauris in semper. Suspendisse leo turpis, facilisis ac facilisis ac, vehicula sit amet urna. Nam pharetra libero mi, ac sagittis quam ultrices quis."
+        template: centos-people
 
-  - title: "areguera"
-    title_lead: "Alain Reguera Delgado"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
 
-  - title: "tobisna"
-    title_lead: "Ansible CentOS infra automation bot"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
+# ===============================================================================
+# httpd_people_directory - Path to people document root.
+#
+# The path to people document root contains the index.html file. This file
+# provides a welcoming message and a list of full names and usernames with
+# links to their respective autoindex pages under centos.org domain.
+# ===============================================================================
+httpd_people_directory: "/var/www/people"
 
-  - title: "avij"
-    title_lead: "Anssi Johansson"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
 
-  - title: "bstinson"
-    title_lead: "Brian Stinson"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
+# ===============================================================================
+# httpd_navbar - Set website navigation bar.
+#
+# The navigation bar is visible on the very top of each CentOS website, where
+# the CentOS logo and the top-level-always-visible links are placed. The navbar
+# can contain both links and menu of links so you can group them. Menus by
+# default are hidden and are visible when the user clicks the item that has the
+# arrow pointing down on right side.
+#
+# The navigation bar the httpd_navbar variable defines is re-used in different
+# website templates (e.g., mailman, wordpress-theme).  For consistency, it must
+# match the content the `_data/centos/navbar.yml` file provides in
+# www.centos.org site.
+#
+# This variable should be defined in a high scope location (e.g., under
+# `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
+# playbooks you run can take advantage of it reducing the number of places you
+# need to change.
+#
+# When you define link inside the navbar, use `httpd_assets_url` variable as
+# much as possible to keep navigability among different environments (e.g.,
+# www.dev.centos.org and www.centos.org).  See `httpd_assets_url` block in this
+# file to know more.
+# ===============================================================================
+httpd_navbar:
+  - name: "Download"
+    icon: "fas fa-download"
+    link: "{{ httpd_assets_url }}/download"
+    menu: []
+  - name: "About"
+    icon: "fas fa-info-circle"
+    link: "#"
+    menu:
+      - name: "About CentOS"
+        link: "{{ httpd_assets_url }}/about"
+      - name: "Frequently Asked Questions (FAQs)"
+        link: "https://wiki.centos.org/FAQ"
+      - name: "Special Interest Groups (SIGs)"
+        link: "https://wiki.centos.org/SpecialInterestGroups"
+      - name: "CentOS Variants"
+        link: "{{ httpd_assets_url }}/variants"
+      - name: "Governance"
+        link: "{{ httpd_assets_url }}/about/governance"
+      - name: "Code of Conduct"
+        link: "{{ httpd_assets_url }}/code-of-conduct"
 
-  - title: "carlwgeorge"
-    title_lead: "Carl George"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
 
-  - title: "tigalch"
-    title_lead: "Christoph Galuschka"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
+# ===============================================================================
+# httpd_social - List of links to social networks.
+#
+# This variable should be defined in a high scope location (e.g., under
+# `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
+# playbooks you run can take advantage of it reducing the number of places you
+# need to change.
+# ===============================================================================
+httpd_social:
+  - icon: "fab fa-twitter"
+    link: "https://twitter.com/centosproject"
+  - icon: "fab fa-youtube"
+    link: "https://youtube.com/TheCentOSProject"
+  - icon: "fab fa-linkedin"
+    link: "https://www.linkedin.com/groups/22405"
+  - icon: "fab fa-reddit"
+    link: "https://www.reddit.com/r/CentOS/"
 
-  - title: "Fabian Arrotin"
-    title_lead: "arrfab"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
 
-  - title: "jpoc"
-    title_lead: "James O'Connor"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "jperrin"
-    title_lead: "Jim Perrin"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "jrd"
-    title_lead: "John R Dennison"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "hughesjr"
-    title_lead: "Johnny Hughes"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "z00dax"
-    title_lead: "Karanbir Singh"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "lpancescu"
-    title_lead: "Laurențiu Păncescu"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "pgreco"
-    title_lead: "Pablo Greco"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "pasik"
-    title_lead: "Pasi Karkkainen"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "range"
-    title_lead: "Ralph Angenendt"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "rbowen"
-    title_lead: "Rich Bowen"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "smooge"
-    title_lead: "Stephen Smoogen"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "alphacc"
-    title_lead: "Thomas Oulevey"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "trevorh"
-    title_lead: "Trevor Hemsley"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
-
-  - title: "tru"
-    title_lead: "Tru Huynh"
-    manifestation: "People"
-    alerts: []
-    paragraphs: []
-    template: centos-people
+# ===============================================================================
+# httpd_copyright - Set copyright sentence and related links.
+#
+# This variable should be defined in a high scope location (e.g., under
+# `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
+# playbooks you run can take advantage of it reducing the number of places you
+# need to change.
+# ===============================================================================
+httpd_copyright:
+  author: "The CentOS Project"
+  year: "{{ ansible_facts.date_time.year }}"
+  legals:
+    - text: "Legal"
+      link: "{{ httpd_assets_url }}/legal"
+    - text: "Privacy"
+      link: "{{ httpd_assets_url }}/legal/privacy"
+    - text: "Site source"
+      link: "https://git.centos.org/centos/centos.org"

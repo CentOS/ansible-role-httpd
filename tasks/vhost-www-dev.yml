@@ -1,3 +1,4 @@
+---
 - name: Ensuring we have a DocumentRoot
   file:
     path: "/var/www/centos_website/"

@@ -1,6 +1,6 @@
 <VirtualHost *:443>
   ServerName "{{ httpd_www_hostname }}"
-  DocumentRoot "{{ httpd_autoindex_people_directory }}"
+  DocumentRoot "{{ httpd_people_directory }}"
 
   Header always set Strict-Transport-Security "max-age=31536000"
   Header always set X-Xss-Protection "1; mode=block"
@@ -14,7 +14,7 @@
   RewriteCond /home/%1 -d
   RewriteRule ^/([^/]+)(.*) /home/$1/public_html/$2
 
-  ReadmeName {{ httpd_autoindex_alias }}/README.html
+  ReadmeName {{ httpd_common_alias }}/README.html
 
   ErrorLog logs/ssl-{{ httpd_www_hostname }}_error.log
   TransferLog logs/ssl-{{ httpd_www_hostname }}_access.log

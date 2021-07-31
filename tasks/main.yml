@@ -1,3 +1,4 @@
+---
 - name: Ensuring httpd is installed
   yum: 
     name: httpd 
@@ -17,6 +18,16 @@
     - 01_common.conf
     - welcome.conf
   notify: restart_httpd 
+
+- name: Create directory for common resources
+  file:
+    path: "/var/www/common"
+    state: directory
+
+- name: Create page not found file
+  template:
+    src: "common/404.html.j2"
+    dest: "{{ httpd_common_directory }}/404.html"
 
 - name: Ensuring httpd service is started
   service: 
@@ -52,7 +63,6 @@
 
 - include_tasks: tls.yml
   when: httpd_tls
-
 
 - block:
     - name: Ensure we have mod_qos pkg installed

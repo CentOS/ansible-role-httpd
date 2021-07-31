@@ -1,3 +1,4 @@
+---
 - import_role:
     name: httpd
     tasks_from: pki-tls
@@ -33,45 +34,40 @@
 
 - name: Creating DocumentRoot for people vhost
   file:
-    path: "{{ httpd_autoindex_people_directory }}"
+    path: "{{ httpd_people_directory }}"
     state: directory
     mode: 0755
 
 - name: Creating autoindex directory structure
   ansible.builtin.file:
-    path: "{{ httpd_autoindex_directory }}/{{ item.template }}-{{ item.title | replace(' ', '-') | lower }}"
+    path: "{{ httpd_common_directory }}/{{ item.template }}-{{ item.title | replace(' ', '-') | lower }}"
     state: directory
     mode: "755"
-  loop: "{{ httpd_autoindex_pages }}"
-
-- name: Creating page not found file
-  template:
-    src: "autoindex/404.html.j2"
-    dest: "{{ httpd_autoindex_directory }}/404.html"
+  loop: "{{ httpd_people_pages }}"
 
 - name: Creating people index file
   template:
-    src: "autoindex/header-centos-people-index.html.j2"
-    dest: "{{ httpd_autoindex_people_directory }}/index.html"
+    src: "common/header-centos-people-index.html.j2"
+    dest: "{{ httpd_people_directory }}/index.html"
 
 - name: Creating people HEADER.html files
   template:
-    src: "autoindex/header-{{ item.template }}.html.j2"
-    dest: "{{ httpd_autoindex_directory }}/{{ item.template }}-{{ item.title | replace(' ', '-') | lower }}/HEADER.html"
+    src: "common/header-{{ item.template }}.html.j2"
+    dest: "{{ httpd_common_directory }}/{{ item.template }}-{{ item.title | replace(' ', '-') | lower }}/HEADER.html"
   when: item.template == "centos-people"
-  loop: "{{ httpd_autoindex_pages }}"
+  loop: "{{ httpd_people_pages }}"
 
 - name: Creating HEADER.html files
   template:
-    src: "autoindex/header-{{ item.template }}.html.j2"
-    dest: "{{ httpd_autoindex_directory }}/{{ item.template }}-{{ item.title | replace(' ', '-') | lower }}/HEADER.html"
+    src: "common/header-{{ item.template }}.html.j2"
+    dest: "{{ httpd_common_directory }}/{{ item.template }}-{{ item.title | replace(' ', '-') | lower }}/HEADER.html"
   when: item.template == "centos"
-  loop: "{{ httpd_autoindex_pages }}"
+  loop: "{{ httpd_people_pages }}"
 
 - name: Creating README.html
   template:
-    src: "autoindex/footer.html.j2"
-    dest: "{{ httpd_autoindex_directory }}/README.html"
+    src: "common/footer.html.j2"
+    dest: "{{ httpd_common_directory }}/README.html"
 
 - name: Configuring httpd vhost for people
   template:

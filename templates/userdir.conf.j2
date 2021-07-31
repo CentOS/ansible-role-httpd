@@ -38,10 +38,10 @@
 #
 # Apply personalized headers for users.
 #
-{% for item in httpd_autoindex_pages %}
+{% for item in httpd_people_pages %}
 {% if item.template == "centos-people" %}
   <Directory "/home/{{ item.title }}/public_html">
-      HeaderName {{ httpd_autoindex_alias }}/{{ item.template }}-{{ item.title }}/HEADER.html
+      HeaderName {{ httpd_common_alias }}/{{ item.template }}-{{ item.title }}/HEADER.html
   </Directory>
 {% endif %}
 {% endfor %}

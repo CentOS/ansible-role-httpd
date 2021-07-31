@@ -19,12 +19,12 @@ NameVirtualHost *:80
 </IfModule>
 
 # Alias to common resources
-Alias "{{ httpd_autoindex_alias }}" "{{ httpd_autoindex_directory }}"
-<Directory "{{ httpd_autoindex_directory }}">
+Alias "{{ httpd_common_alias }}" "{{ httpd_common_directory }}"
+<Directory "{{ httpd_common_directory }}">
   AllowOverride None
   Require all granted
 </Directory>
 
 # Customized ErrorDocument files
-ErrorDocument 404 {{ httpd_autoindex_alias }}/404.html
+ErrorDocument 404 {{ httpd_common_alias }}/404.html
 
