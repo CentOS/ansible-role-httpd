@@ -1,0 +1,111 @@
+#!/bin/bash
+
+#
+# Purposes : renders and publish website from git 
+# Called by: cron
+# Configured by: Ansible, don't edit
+#
+
+action="$1"
+git_upstream="https://git.centos.org/centos/centos-infra-docs.git" # Where to git clone/pull from
+git_directory="/home/{{ httpd_docs_sigs_user }}/git/"
+logfile="/home/{{ httpd_docs_sigs_user }}/mkdocs-sigs.log"
+
+function usage() {
+cat << EOF
+You need to call the script like this : $0 -arguments
+Argument can be one of the following:
+  -a : action [required, possible values : build , init ]
+  -s : sig name for which we'll clone/build docs
+  -u : git url (origin) where mkdocs git repo is hosted
+
+EOF
+}
+
+function varcheck() {
+if [ -z "$1" ] ; then
+        usage
+        exit 1
+fi
+}
+
+function f_log() {
+   echo "[+] $(date +%Y%m%d-%H:%M) $(basename $0) -> $*" >>$logfile
+}
+
+function init(){
+  test -d ${git_directory}/${sig_name} || mkdir -p ${git_directory}/${sig_name}
+  pushd ${git_directory}/${sig_name} >/dev/null
+  test -d ${sig_name}-docs || git clone ${git_upstream} ${sig_name}-docs >> $logfile 2>&1
+  podman images |grep -q mkdocs-material || podman pull docker.io/squidfunk/mkdocs-material:latest >>$logfile
+popd >/dev/null
+  touch /home/{{ httpd_docs_sigs_user }}/git/${sig_name}.init
+  render
+}
+
+function render(){
+  podman run --volume="${git_directory}/${sig_name}/${sig_name}-docs:/docs:z" --rm -it squidfunk/mkdocs-material build 2>&1 > /dev/null && cp -r ${git_directory}/${sig_name}/${sig_name}-docs/site/* /var/www/sigs/${sig_name}/
+  if [ "$?" -eq "0" ] ; then
+    f_log "[${sig_name}] - Rendering status : $?"
+  else
+    f_log "[${sig_name}] [ERROR] issue detected when building website"
+  fi
+}
+
+function build(){
+  pushd ${git_directory}/${sig_name}/${sig_name}-docs >/dev/null
+  last_commit=$(git log| head -n 1|awk '{print $2}')
+  git pull >/dev/null 2>&1
+  current_commit=$(git log| head -n 1|awk '{print $2}')
+  popd >/dev/null
+
+  if [ "${current_commit}" == "${last_commit}" ] ; then
+    f_log "[${sig_name}] - Git head/last commit is equal [${current_commit}]"
+    f_log "[${sig_name}] - Skipping website build and push"
+  else
+    render
+fi
+}
+
+# Parsing args
+
+
+while getopts "ha:s:u:" option
+do
+  case ${option} in
+    h)
+      usage
+      exit 1
+      ;;
+    a)
+      action="${OPTARG}"
+      ;;
+    s)
+      sig_name="${OPTARG}"
+      ;;
+    u)
+      git_upstream=${OPTARG}
+      ;;
+    ?)
+      usage
+      exit
+      ;;
+  esac
+done
+
+varcheck ${sig_name}
+varcheck ${git_upstream}
+varcheck ${action}
+
+if [ "$action" == "init" ] ; then
+   f_log "[${sig_name}] - Initializing workspace for SIG ..."
+   init
+elif [ "$action" ==  "build" ] ; then
+   f_log "[${sig_name}] : Comparing upstream git HEAD and rebuilding if needed"
+   build
+else
+  usage
+  exit 1
+fi
+
+

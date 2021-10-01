@@ -1,0 +1,7 @@
+#!/bin/bash
+# Called by cron and configured by Ansible
+# purposes: check upstream git repositories and rebuild website if needed
+
+{% for item in httpd_docs_sigs_list %}
+/usr/libexec/centos/mkdocs-sigs -a build -s {{ item.name }} -u {{ item.doc_git_origin }}
+{% endfor %}

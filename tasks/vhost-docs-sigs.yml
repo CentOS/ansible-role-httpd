@@ -1,0 +1,109 @@
+# This task is just for the sigs.centos.org node, automatically rendering (through podman) website content
+
+- import_role:
+    name: httpd
+  vars:  
+    httpd_tls: True
+
+- import_role:
+    name: httpd
+    tasks_from: pki-tls
+  vars:
+    pki_hostname: sigs.centos.org
+    
+- name: Adding specific user to build mkdocs site
+  user: 
+    name: "{{ httpd_docs_sigs_user }}"
+    state: present 
+    comment: CentOS SIG Web content user
+
+- name: Ensuring we have a DocumentRoot
+  file:
+    path: "{{ httpd_docs_sigs_rootdir }}"
+    state: directory
+    owner: '{{ httpd_docs_sigs_user }}'
+    group: '{{ httpd_docs_sigs_user }}'
+    mode: 0775
+
+- name: Building index from jinja2
+  template:
+    src: docs-sigs/index.html.j2
+    dest: "{{ httpd_docs_sigs_rootdir }}/index.html"
+  tags:
+    - index
+
+- name: Ensuring we have a sub-folder to push the SIG doc content to
+  file:
+    path: "{{ httpd_docs_sigs_rootdir }}/{{ item.name }}"
+    state: directory
+    owner: '{{ httpd_docs_sigs_user }}'
+    group: '{{ httpd_docs_sigs_user }}'
+    mode: 0775
+  with_items: "{{ httpd_docs_sigs_list }}"
+  loop_control:
+    label: '{{ item.name }}'
+  tags:
+    - sigs
+    
+
+- name: Configuring httpd vhost for www
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/httpd/conf.d/{{ item }}"
+    mode: 0644
+  with_items:
+    - 02_vhost-docs-sigs.conf
+    - ssl-vhost-docs-sigs.conf
+  notify:
+    - reload_httpd
+  tags:
+    - config
+
+- name: Install some tools to render website locally
+  yum:
+    name: 
+      - podman
+      - git
+    state: installed
+
+- name: Enabling needed selinux booleans
+  seboolean:
+    name: "{{ item }}"
+    persistent: yes
+    state: on
+  with_items:
+    - httpd_can_network_connect
+
+- name: Wrapper tool to build website
+  template:
+    src: "docs-sigs/{{ item }}.j2"
+    dest: "/usr/libexec/centos/{{ item }}"
+    mode: 0750
+    owner: "{{ httpd_docs_sigs_user }}"
+  with_items:
+    - mkdocs-sigs
+    - mkdocs-cron
+  tags:
+    - script
+
+- name: Init podman containers
+  command: 
+    cmd: "/usr/libexec/centos/mkdocs-sigs -a init -s {{ item.name }} -u {{ item.doc_git_origin }}"
+    creates: "/home/{{ httpd_docs_sigs_user }}/git/{{ item.name }}.init"
+  become_user: "{{ httpd_docs_sigs_user }}"
+  with_items:  "{{ httpd_docs_sigs_list }}"
+  loop_control:
+    label: '{{ item.name }}'
+  tags:
+    - script
+
+- name: Rebuild SIGs doc sites
+  cron:
+    name: Build mkdocs sig sites from git
+    job: /usr/libexec/centos/mkdocs-cron
+    minute: "*/2"
+    user: "{{ httpd_docs_sigs_user }}"
+  tags:
+    - cron
+
+

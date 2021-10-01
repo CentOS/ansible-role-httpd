@@ -52,6 +52,23 @@ reposnap_rsync_from: msync.centos.org::centos/
 # For SCL php task
 scl_php_ver: 73
 
+# For docs-infra task, used to render docs.infra.centos.org content
+httpd_docs_infra_user: centos
+httpd_docs_infra_rootdir: /var/www/docs.infra
+httpd_docs_infra_hostname: docs.infra.centos.org
+
+# For SIG docs task, used to render sig.centos.org/<name> content
+httpd_docs_sigs_user: centos
+httpd_docs_sigs_rootdir: /var/www/sigs
+httpd_docs_sigs_hostname: sigs.centos.org
+# the following list contains SIGS name, upstream git origin for where to find the doc to render it through mkdocs podman container
+# example
+# httpd_docs_sigs_list:
+#   - name: infra
+#     doc_git_origin: https://git.centos.org/centos/centos-infra-docs.git
+#     description: the CentOS Infra SIG documentation
+httpd_docs_sigs_list: []
+
 # For www task
 httpd_www_rootdir: /var/www/centos_website
 httpd_www_hostname: www.centos.org
