@@ -15,8 +15,15 @@ NameVirtualHost *:80
 Alias /header /var/www/centos/header
 Alias /centos-design /var/www/centos-design
 
+# Alias to common resources
+Alias "{{ httpd_common_alias }}" "{{ httpd_common_directory }}"
+<Directory "{{ httpd_common_directory }}">
+  AllowOverride None
+  Require all granted
+</Directory>
+
 # Some customized ErrorDocument files
-ErrorDocument 404 /centos-design/404.html
+ErrorDocument 404 {{ httpd_common_alias }}/404.html
 
 # Prefork tuning
 <IfModule mpm_prefork_module>
