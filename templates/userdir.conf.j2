@@ -29,8 +29,24 @@
 # for a site where these directories are restricted to read-only.
 #
 <Directory "/home/*/public_html">
-    IndexOptions NameWidth=* +SuppressHTMLPreamble
+    IndexOptions FancyIndexing -HTMLTable VersionSort SuppressHTMLPreamble XHTML
     AllowOverride FileInfo AuthConfig Limit Indexes
     Options MultiViews Indexes SymLinksIfOwnerMatch IncludesNoExec
     Require method GET POST OPTIONS
+    Require all granted
 </Directory>
+
+#
+# Autoindex headers. The header information is specific for each single user.
+#
+{% for user in people_users %}
+<Directory "/home/{{ user.login_name }}/public_html">
+  HeaderName /HEADER-{{ user.login_name }}.html
+</Directory>
+{% endfor %}
+
+#
+# Autoindex footer. The footer information is common to all users.
+#
+ReadmeName /FOOTER.html
+

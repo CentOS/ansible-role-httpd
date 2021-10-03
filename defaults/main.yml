@@ -111,6 +111,14 @@ httpd_mirrorlist_internal_url: mirror.centos.org
 httpd_people_hostname: people.centos.org
 
 # ===============================================================================
+# httpd_people_dirname - Set people entry point.
+#
+# This is the absolute path to the directory where people index.html will be
+# stored in. This is where the list of users is presented.
+# ===============================================================================
+httpd_people_dirname: "/var/www/people"
+
+# ===============================================================================
 # httpd_common_alias - Set http alias to common http resources
 #
 # This is the location that will be used in the ErrorDocument directive to
@@ -201,7 +209,7 @@ httpd_navbar:
 # ===============================================================================
 httpd_social:
   - icon: "fab fa-twitter"
-    link: "https://twitter.com/centosproject"
+    link: "https://twitter.com/centos"
   - icon: "fab fa-youtube"
     link: "https://youtube.com/TheCentOSProject"
   - icon: "fab fa-linkedin"
