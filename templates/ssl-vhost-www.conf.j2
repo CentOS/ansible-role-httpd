@@ -9,6 +9,12 @@
  Header always set X-Content-Type-Options "nosniff"
  Header always set Referrer-Policy "same-origin"
 
+ # Allow Cross-Origin Resource Sharing (CORS) in centos.org domain to reuse
+ # common resources like CSS, fonts, etc. Thanks so much to Fabian (arrfab) for
+ # this pretty clever solution to beat CORS limitations.
+ SetEnvIf Origin "^http(s)?://(.+\.)?(centos\.org)$" origin_is=$0
+ Header always set Access-Control-Allow-Origin %{origin_is}e env=origin_is
+
 RewriteEngine on
 
 {{ httpd_www_snippet }}
