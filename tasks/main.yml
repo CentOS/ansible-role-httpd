@@ -32,6 +32,16 @@
     dest: /var/www/centos-design/header-{{ httpd_html_autoindex_title | lower | replace(" ","-") }}.html
     mode: 0644
 
+- name: Create directory for common resources
+  file:
+    path: "{{ httpd_common_directory }}"
+    state: directory
+
+- name: Create page not found file
+  template:
+    src: "common/404.html.j2"
+    dest: "{{ httpd_common_directory }}/404.html"
+
 - name: Ensuring httpd service is started
   service: 
     name: httpd 

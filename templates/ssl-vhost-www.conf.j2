@@ -9,6 +9,12 @@
  Header always set X-Content-Type-Options "nosniff"
  Header always set Referrer-Policy "same-origin"
 
+ # Allow Cross-Origin Resource Sharing (CORS) in centos.org domain to reuse
+ # common resources like CSS, fonts, etc. Thanks so much to Fabian (arrfab) for
+ # this pretty clever solution to beat CORS limitations.
+ SetEnvIf Origin "^http(s)?://(.+\.)?(centos\.org)$" origin_is=$0
+ Header always set Access-Control-Allow-Origin %{origin_is}e env=origin_is
+
 RewriteEngine on
 
 {{ httpd_www_snippet }}
@@ -17,9 +23,7 @@ ErrorLog logs/ssl-{{ httpd_www_hostname }}_error.log
 TransferLog logs/ssl-{{ httpd_www_hostname }}_access.log
 LogLevel warn
 SSLEngine on
-SSLHonorCipherOrder on
-SSLProtocol all -SSLv2 -SSLv3
-SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW:!aNULL:!eNULL:!DES:!MD5:!PSK:!RC4
+{{ httpd_tls_ciphers }}
 
 SSLCertificateFile /etc/pki/tls/certs/{{ httpd_www_hostname }}.crt
 SSLCertificateKeyFile /etc/pki/tls/private/{{ httpd_www_hostname }}.key

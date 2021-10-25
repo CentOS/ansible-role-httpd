@@ -4,6 +4,12 @@ httpd_public: True
 
 # Should openssl/mod_ssl be installed by default
 httpd_tls: False
+# If using TLS, which are the protocols/ciphers we can to apply
+httpd_tls_ciphers: |
+  # https://ssl-config.mozilla.org/#server=apache&version=2.4.6&config=intermediate&openssl=1.0.2k&guideline=5.6 
+  SSLProtocol             all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
+  SSLCipherSuite          ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+  SSLHonorCipherOrder     off
 
 # Central LetsEncrypt node for the cerbot redirection
 httpd_certbot_fqdn: certbot.domain.com
@@ -98,3 +104,121 @@ httpd_mirrorlist_internal_url: mirror.centos.org
 
 # For vhost-people task
 httpd_people_hostname: people.centos.org
+
+# ===============================================================================
+# httpd_common_alias - Set http alias to common http resources
+#
+# This is the location that will be used in the ErrorDocument directive to
+# refer CentOS customized 404 page. Also, it will be used to refer customized
+# autoindex header and footer files necessary on both people and services
+# specific sites.
+# ===============================================================================
+httpd_common_alias: "/common"
+
+# ==============================================================================
+# httpd_common_directory - Set directory path to common http resources
+#
+# Common resources include files like 404.html, and autoindex pages specific to
+# people and services.
+# ==============================================================================
+httpd_common_directory: "/var/www/common"
+
+# ===============================================================================
+# httpd_assets_url - Set assets url (without trailing slash).
+#
+# Here is were css, images and js files will be retrieved from. This is
+# normally "https://www.centos.org" in production and
+# "https://www.dev.centos.org" in development. When we change the main site
+# design all other sites based on it will be changed as well and there won't be
+# necessary to maintain separated files. In order for this to work, origin
+# domains must be specified in httpd_www_cors option.
+#
+# This variable should be defined in a high scope location (e.g., under
+# `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
+# playbooks you run can take advantage of it reducing the number of places you
+# need to change.
+# ===============================================================================
+httpd_assets_url: "https://www.centos.org"
+
+# ===============================================================================
+# httpd_navbar - Set website navigation bar.
+#
+# The navigation bar is visible on the very top of each CentOS website, where
+# the CentOS logo and the top-level-always-visible links are placed. The navbar
+# can contain both links and menu of links so you can group them. Menus by
+# default are hidden and are visible when the user clicks the item that has the
+# arrow pointing down on right side.
+#
+# The navigation bar the httpd_navbar variable defines is re-used in different
+# website templates (e.g., mailman, wordpress-theme).  For consistency, it must
+# match the content the `_data/centos/navbar.yml` file provides in
+# www.centos.org site.
+#
+# This variable should be defined in a high scope location (e.g., under
+# `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
+# playbooks you run can take advantage of it reducing the number of places you
+# need to change.
+#
+# When you define link inside the navbar, use `httpd_assets_url` variable as
+# much as possible to keep navigability among different environments (e.g.,
+# www.dev.centos.org and www.centos.org).  See `httpd_assets_url` block in this
+# file to know more.
+# ===============================================================================
+httpd_navbar:
+  - name: "Download"
+    icon: "fas fa-download"
+    link: "{{ httpd_assets_url }}/download"
+    menu: []
+  - name: "About"
+    icon: "fas fa-info-circle"
+    link: "#"
+    menu:
+      - name: "About CentOS"
+        link: "{{ httpd_assets_url }}/about"
+      - name: "Frequently Asked Questions (FAQs)"
+        link: "https://wiki.centos.org/FAQ"
+      - name: "Special Interest Groups (SIGs)"
+        link: "https://wiki.centos.org/SpecialInterestGroups"
+      - name: "CentOS Variants"
+        link: "{{ httpd_assets_url }}/variants"
+      - name: "Governance"
+        link: "{{ httpd_assets_url }}/about/governance"
+      - name: "Code of Conduct"
+        link: "{{ httpd_assets_url }}/code-of-conduct"
+
+# ===============================================================================
+# httpd_social - List of links to social networks.
+#
+# This variable should be defined in a high scope location (e.g., under
+# `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
+# playbooks you run can take advantage of it reducing the number of places you
+# need to change.
+# ===============================================================================
+httpd_social:
+  - icon: "fab fa-twitter"
+    link: "https://twitter.com/centosproject"
+  - icon: "fab fa-youtube"
+    link: "https://youtube.com/TheCentOSProject"
+  - icon: "fab fa-linkedin"
+    link: "https://www.linkedin.com/groups/22405"
+  - icon: "fab fa-reddit"
+    link: "https://www.reddit.com/r/CentOS/"
+
+# ===============================================================================
+# httpd_copyright - Set copyright sentence and related links.
+#
+# This variable should be defined in a high scope location (e.g., under
+# `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
+# playbooks you run can take advantage of it reducing the number of places you
+# need to change.
+# ===============================================================================
+httpd_copyright:
+  author: "The CentOS Project"
+  year: "{{ ansible_facts.date_time.year }}"
+  legals:
+    - text: "Legal"
+      link: "{{ httpd_assets_url }}/legal"
+    - text: "Privacy"
+      link: "{{ httpd_assets_url }}/legal/privacy"
+    - text: "Site source"
+      link: "https://git.centos.org/centos/centos.org"
