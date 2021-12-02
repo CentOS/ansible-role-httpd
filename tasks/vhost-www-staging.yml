@@ -86,25 +86,25 @@
   tags:
     - script
 
-#- name: Cron to compare upstream git
-#  cron:
-#    name: Build website from git
-#    job: "/usr/libexec/centos/centos_website build {{ item.branch }}"
-#    minute: "*/2"
-#    user: "{{ item.name }}"
-#  with_items: "{{ httpd_www_local_users }}"
-#  tags:
-#    - cron
+- name: Cron to compare upstream git
+  cron:
+    name: Build website from git
+    job: "/usr/libexec/centos/centos_website build {{ item.branch }}"
+    minute: "*/2"
+    user: "{{ item.name }}"
+  with_items: "{{ httpd_www_local_users }}"
+  tags:
+    - cron
 
-#- name: Cron to refresh external content for website
-#  cron:
-#    name: Refreshing csv and rss files for website
-#    job: "/usr/libexec/centos/centos_website refresh {{ item.branch }}"
-#    minute: "25"
-#    user: "{{ item.name }}"
-#  with_items: "{{ httpd_www_local_users }}"
-#  tags:
-#    - cron
+- name: Cron to refresh external content for website
+  cron:
+    name: Refreshing csv and rss files for website
+    job: "/usr/libexec/centos/centos_website refresh {{ item.branch }}"
+    minute: "25"
+    user: "{{ item.name }}"
+  with_items: "{{ httpd_www_local_users }}"
+  tags:
+    - cron
 
 - block: 
     - name: Configuring agent in Zabbix server
