@@ -87,7 +87,12 @@ httpd_www_push_users:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDRL1TUUwizrKopU5AOvJR6jCBAIA41Jr5nAZBZT3gQQAzEETgxeDJXGfiG9vZnfNMZuVoiomgxl+u8HaiyKV8CiXOiE/Afj+6qsdmbUlAkOCs+rAHoFiaSmkKP8gC7yMeBAO22FRDH/P+OAHOwFxvcaeOKb86xHPlRePOMABRWZBpdUNYUOE2ZD6jn2ywnhxAr2BLOmFKbIJsMirvQS3v4qbjyzmcyje4qnw9Ypen79VGz/FukEc8tJKhrD5dvncNEcdA0WJ/4fjHv30fpeAkil3ChSkH5u0d8DESoBba21f6SySYlAwJmZVUM3Orb4hgMkP+JXIvL/UcZMyC7pEmFwMGXcsQigInwLj3RMZ6CKbZ6VTtcYEGZ4h7uD8YJNwGsdDcWYFOnyIZmsY1KrQ4oIBv3WBo29VcdzoyZaatnieQFa5mc+mO7WWdGHp/rd1r0OdhjbgbgjViTGaiVN+YDXWth7GBgvEVQrWZRmYGOmbKyJQgv25lFpQvRLw5WSPP3uEoXVLk3KpoPUckMd2i5N8HutaF16psP0MaAx3NxoRFPHI/+ko5LY3pNcIQtAwmIRbmvdit7KZkF3SBwxZ5bET/XdlviOkT9HtGDhNoEZ6ESIK4RyLIlHbXsDWFu2nkGNlTcv4EJxFHrsoaPW323sdsjhSgeB8Ip0587Tp5imQ==
 
 # www staging task where website is rendered
-httpd_www_local_user: centos
+httpd_www_local_users: 
+  - name: centos
+    branch: master
+  - name: centos_staging
+    branch: staging
+
 httpd_www_git_upstream: https://git.centos.org/centos/centos.org.git
 # Servers we need to push content to
 httpd_www_servers: "web1.test.centos.org web2.test.centos.org"
