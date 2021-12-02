@@ -7,18 +7,20 @@
 #
 
 action="$1"
+git_branch="$2"
 web_servers="{{ httpd_www_servers }}" # servers to push content to
 git_upstream="{{ httpd_www_git_upstream }}" # Where to git clone/pull from
-git_directory="/home/{{ httpd_www_local_user }}/git/"
-logfile="/home/{{ httpd_www_local_user }}/centos_website.log"
+git_directory="${HOME}/git/"
+logfile="${HOME}/centos_website-${git_branch}.log"
 
 function usage() {
 cat << EOF
-You need to call the script like this : $0 -arguments
-Argument can be one of the following:
+You need to call the script like this : $0 <action> <branch>
+<action> can be one of the following:
  init			: prepares local jekyll container and git initial clone
  build		: verify upstream git and rebuild if different
- refresh	: download from external sources content like .csv files to update website
+ refresh	: download from external sources content like .csv files to update website<
+<branch> can be master or staging 
 
 EOF
 }
@@ -31,6 +33,7 @@ function init(){
   test -d ${git_directory} || mkdir -p ${git_directory}
   pushd ${git_directory} >/dev/null
   test -d centos.org || git clone ${git_upstream} >> $logfile
+  pushd centos.org >> $logfile ; git checkout ${git_branch} >> $logfile ; popd >> $logfile
   for i in .jekyll-cache vendor vendor/bundle _site ; do 
     podman unshare mkdir -p ${git_directory}/centos.org/${i}
     podman unshare chown -R 1000:1000 ${git_directory}/centos.org/${i}
@@ -66,19 +69,29 @@ function refresh(){
 }
 
 function render(){
-  podman run --volume="${git_directory}/centos.org:/srv/jekyll:z" --volume="${git_directory}/centos.org/vendor/bundle:/usr/local/bundle:z" --rm -it jekyll/jekyll jekyll build 2>&1 > /dev/null && cp -r ${git_directory}/centos.org/_site/* /var/www/centos_website/
+  podman run --volume="${git_directory}/centos.org:/srv/jekyll:z" --volume="${git_directory}/centos.org/vendor/bundle:/usr/local/bundle:z" --rm -it jekyll/jekyll jekyll build 2>&1 > /dev/null 
   if [ "$?" -eq "0" ] ; then
-  f_log "Rendering status : $?, pushing to www nodes"
-    for node in ${web_servers}; do
-      f_log "Pushing content to $node .."
-      rsync -aH --delete-after /var/www/centos_website/ wwwpush@${node}:/var/www/centos_website/ >/dev/null 2>&1 
-      if [ "$?" -ne "0" ] ; then
-        f_log "[ERROR] Error pushing to target ${node}."
-        f_log "Exiting process"
-        zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
-        exit 1
-      fi 
-    done
+    f_log "Rendering status : $?"
+    if [ "${git_branch}" == "staging" ] ; then
+      f_log "git branch is [${git_branch}] to copying locally"
+      cp -r ${git_directory}/centos.org/_site/* /var/www/centos_website/
+    else
+      f_log "git branch is [${git_branch}] so pushing live to www nodes"
+      if [ -z "${web_servers}" ] ; then
+        f_log "Empty web servers list to nowhere to push, skipping"
+      else
+				for node in ${web_servers}; do
+					f_log "Pushing content to $node .."
+					rsync -aH --delete-after  ${git_directory}/centos.org/_site/ wwwpush@${node}:/var/www/centos_website/ >/dev/null 2>&1 
+					if [ "$?" -ne "0" ] ; then
+						f_log "[ERROR] Error pushing to target ${node}."
+						f_log "Exiting process"
+						zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
+						exit 1
+					fi 
+				done
+      fi
+    fi
   else
     f_log "[ERROR] issue detected when building website"
     zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
@@ -87,13 +100,14 @@ function render(){
 
 function build(){
   pushd ${git_directory}/centos.org >/dev/null
+  git checkout ${git_branch} >>$logfile
   last_commit=$(git log| head -n 1|awk '{print $2}')
-  git pull >/dev/null
+  git pull origin ${git_branch}>/dev/null
   current_commit=$(git log| head -n 1|awk '{print $2}')
   popd >/dev/null
 
   if [ "${current_commit}" == "${last_commit}" ] ; then
-    f_log "Git head/last commit is equal [${current_commit}]"
+    f_log "Git head/last commit is equal [${current_commit}] for branch [${git_branch}]"
     f_log "Skipping website build and push"
   else
     render
@@ -101,7 +115,7 @@ fi
 }
 
 if [ "$action" == "init" ] ; then
-   f_log "Initializing ..."
+   f_log "Initializing for branch [${git_branch}] ..."
    init
 elif [ "$action" ==  "build" ] ; then
    f_log "Comparing upstream git HEAD and rebuilding if needed"
@@ -116,4 +130,4 @@ fi
 
 # If we made it here, that means all was ok so updating zabbix status
 zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 0 >/dev/null
-
+exit 0
