@@ -73,7 +73,7 @@ function render(){
   if [ "$?" -eq "0" ] ; then
     f_log "Rendering status : $?"
     if [ "${git_branch}" == "staging" ] ; then
-      f_log "git branch is [${git_branch}] to copying locally"
+      f_log "git branch is [${git_branch}] so copying locally"
       cp -r ${git_directory}/centos.org/_site/* /var/www/centos_website/
     else
       f_log "git branch is [${git_branch}] so pushing live to www nodes"
