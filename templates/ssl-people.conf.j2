@@ -1,5 +1,5 @@
 <VirtualHost *:443>
-DocumentRoot "/var/www/people"
+DocumentRoot "{{ httpd_people_dirname }}"
 
   Header always set Strict-Transport-Security "max-age=31536000"
   Header always set X-Xss-Protection "1; mode=block"
@@ -13,12 +13,6 @@ DocumentRoot "/var/www/people"
   RewriteCond /home/%1 -d
   RewriteRule ^/([^/]+)(.*) /home/$1/public_html/$2
 
-  HeaderName /centos-design/header.html
-  ReadmeName /centos-design/footer.html
-  # Global for each user directory
-  IndexOptions +SuppressHTMLPreamble NameWidth=*
-  IndexStyleSheet "/centos-design/css/centos-listindex.css"
-
   <Directory "/var/www/people">
     Options Indexes FollowSymLinks
     <IfVersion < 2.4>
@@ -26,8 +20,6 @@ DocumentRoot "/var/www/people"
     Allow from all
     </IfVersion>
     <IfVersion >= 2.4>
-    IndexOptions +SuppressHTMLPreamble NameWidth=*
-    IndexStyleSheet "/centos-design/css/centos-listindex.css"
     Require all granted
     </IfVersion>
   </Directory>
