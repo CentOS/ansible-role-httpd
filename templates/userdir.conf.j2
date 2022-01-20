@@ -29,7 +29,7 @@
 # for a site where these directories are restricted to read-only.
 #
 <Directory "/home/*/public_html">
-    IndexOptions FancyIndexing -HTMLTable VersionSort SuppressHTMLPreamble XHTML
+    IndexOptions FancyIndexing NameWidth=* -HTMLTable VersionSort SuppressDescription SuppressHTMLPreamble XHTML Charset=UTF-8
     AllowOverride FileInfo AuthConfig Limit Indexes
     Options MultiViews Indexes SymLinksIfOwnerMatch IncludesNoExec
     Require method GET POST OPTIONS

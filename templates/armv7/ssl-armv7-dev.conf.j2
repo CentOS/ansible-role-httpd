@@ -13,7 +13,7 @@ Alias /rpmbuild /rpmbuild
  <Directory "/rpmbuild">
   AllowOverride Indexes
   Options Indexes FollowSymLinks MultiViews
-  IndexOptions NameWidth=*
+  IndexOptions FancyIndexing NameWidth=* -HTMLTable VersionSort SuppressDescription SuppressHTMLPreamble XHTML Charset=UTF-8
   <IfVersion < 2.4>
     Order allow,deny
     Allow from all
@@ -30,7 +30,7 @@ Alias /repodir /repodir
  <Directory "/repodir">
   AllowOverride Indexes
   Options Indexes FollowSymLinks MultiViews
-  IndexOptions NameWidth=*
+  IndexOptions FancyIndexing NameWidth=* -HTMLTable VersionSort SuppressDescription SuppressHTMLPreamble XHTML Charset=UTF-8
   <IfVersion < 2.4>
     Order allow,deny
     Allow from all
@@ -45,7 +45,7 @@ Alias /repos /repos
  <Directory "/repos">
   AllowOverride Indexes
   Options Indexes FollowSymLinks MultiViews
-  IndexOptions NameWidth=*
+  IndexOptions FancyIndexing NameWidth=* -HTMLTable VersionSort SuppressDescription SuppressHTMLPreamble XHTML Charset=UTF-8
   <IfVersion < 2.4>
     Order allow,deny
     Allow from all
