@@ -32,6 +32,12 @@
     dest: /var/www/centos-design/header-{{ httpd_html_autoindex_title | lower | replace(" ","-") }}.html
     mode: 0644
 
+- name: Creating CentOS default footer
+  template:
+    src: common/footer.html.j2
+    dest: /var/www/centos-design/footer.html
+    mode: 0644
+
 - name: Create directory for common resources
   file:
     path: "{{ httpd_common_directory }}"

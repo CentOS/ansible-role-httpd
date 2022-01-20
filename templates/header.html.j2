@@ -11,7 +11,7 @@
     {% include "common/header-navbar.html.j2" %}
     <header class="header header__page">
       <h1 class="header__page__title">{{ httpd_html_autoindex_title }}</h1>
-      {% if httpd_html_autoindex_description %}
+      {% if httpd_html_autoindex_description is defined %}
       <p class="header__page__description">{{ httpd_html_autoindex_description }}</p>
       {% endif %}
     </header>
