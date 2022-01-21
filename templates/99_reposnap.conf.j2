@@ -15,7 +15,7 @@ Alias /reposnap/ {{ reposnap_local_dir }}/reposnap
     Allow from all
   </IfVersion>
   <IfVersion >= 2.4>
-    IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
+    IndexOptions FancyIndexing NameWidth=* -HTMLTable VersionSort SuppressDescription SuppressHTMLPreamble XHTML Charset=UTF-8
     Require all granted
   </IfVersion>
  </Directory>

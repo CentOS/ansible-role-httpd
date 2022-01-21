@@ -21,7 +21,7 @@
 {% endif %}
   </IfVersion>
   <IfVersion >= 2.4>
-    IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
+  IndexOptions FancyIndexing NameWidth=* -HTMLTable VersionSort SuppressDescription SuppressHTMLPreamble XHTML Charset=UTF-8
 {% if item.acl is defined %}
 {% for allowed in item.acl %}
     Require ip {{ allowed }}
