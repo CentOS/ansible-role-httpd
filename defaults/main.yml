@@ -89,7 +89,7 @@ httpd_www_push_users:
 # www staging task where website is rendered
 httpd_www_local_users: 
   - name: centos
-    branch: master
+    branch: main
   - name: centos_staging
     branch: staging
 
