@@ -1,0 +1,6 @@
+- name: Creating CentOS custom header
+  template:
+    src: header.html.j2
+    dest: /var/www/centos-design/header-{{ httpd_html_custom_header_title | lower | replace(" ","-") }}.html
+    mode: 0644
+
