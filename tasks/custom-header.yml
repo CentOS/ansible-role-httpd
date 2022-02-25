@@ -1,3 +1,13 @@
+# this task should just be imported from other role to have a custom header for mod_autoindex
+# Example of how to import it and which variables to use/declared
+# - import_role:
+#     name: httpd
+#     tasks_from: custom-header
+#   vars: 
+#     - httpd_html_custom_header_title: "CentOS Stream Mirror" # html <title>
+#     - httpd_html_autoindex_title: "CentOS Stream Mirror"     # title for html body
+#     - httpd_html_autoindex_content: "{{ mirror_stream_httpd_header }}" # block that is injected before directory listing
+
 - name: Creating CentOS custom header
   template:
     src: header.html.j2
