@@ -235,3 +235,36 @@ httpd_copyright:
       link: "{{ httpd_assets_url }}/legal/privacy"
     - text: "Site source"
       link: "https://git.centos.org/centos/centos.org"
+
+
+# For the vhost-shared-dir task
+# It permits to quickly share over http/https a local directory and not coming from a role
+# We can combine (all optional so default to all open):
+#  - tls (boolean but would expect existing cert/key matching fqdn)
+#  - acl (IP based)
+#  - basic auth (would exclude IP ACL as using user/password instead)
+# 
+# Example:
+# httpd_vhost_shared_list:
+#   - name: test
+#     fqdn: test.domain.com
+#     path: /srv/test
+#   - name: restricted
+#     fqdn: test2.domain.com
+#     path: /srv/test2
+#     acl:
+#       - 192.168.1.0/23
+#   - name: tls_protected
+#     fqdn: tls.domain.com
+#     path: /srv/test3
+#     tls: True
+#   - name: tls_and_auth
+#     fqdn: tls-auth.domain.com
+#     tls: True
+#     auth: True
+#     auth_user: user
+#     auth_password: mypassword
+
+httpd_vhost_shared_list: []
+
+

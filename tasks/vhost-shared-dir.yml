@@ -1,4 +1,9 @@
 # This task can be included and will parse the httpd_vhost_shared_list
+# We can combine (all optional so default to all open):
+#  - tls (boolean but would expect existing cert/key matching fqdn)
+#  - acl (IP based)
+#  - basic auth (would exclude IP ACL as using user/password instead)
+# 
 # Example:
 # httpd_vhost_shared_list:
 #   - name: test
@@ -9,14 +14,109 @@
 #     path: /srv/test2
 #     acl:
 #       - 192.168.1.0/23
-#  
+#   - name: tls_protected
+#     fqdn: tls.domain.com
+#     path: /srv/test3
+#     tls: True
+#   - name: tls_and_auth
+#     fqdn: tls-auth.domain.com
+#     tls: True
+#     auth: True
+#     auth_user: user
+#     auth_password: mypassword
 
-- name: vhost configs
+- name: httpd vhost shared dir config[s]
   template:
     src: 99_vhost-shared-dir.conf.j2
     dest: "/etc/httpd/conf.d/99_vhost_{{ item.name }}.conf"
     mode: 0644
   with_items: "{{ httpd_vhost_shared_list }}"  
+  loop_control:
+    label: "{{ item.name }}"
   notify:
     - restart_httpd
+  tags:
+   - vhost
 
+- name: TLS httpd vhost config[s] (if needed)
+  template:
+    src: ssl-vhost-shared-dir.conf.j2
+    dest: "/etc/httpd/conf.d/ssl-vhost-{{ item.name }}.conf"
+    mode: 0644
+  with_items: "{{ httpd_vhost_shared_list }}" 
+  loop_control:
+    label: "{{ item.name }}"
+  when: 
+    - item.tls is defined 
+    - item.tls
+  notify:
+    - restart_httpd
+  tags:
+   - vhost
+
+
+- name: Configure httpd TLS (if needed)
+  include_role:
+    name: httpd
+    tasks_from: tls
+  with_items: "{{ httpd_vhost_shared_list }}" 
+  run_once: True
+  when: 
+    - vhost_shared_item.tls is defined 
+    - vhost_shared_item.tls
+  loop_control:
+    loop_var: vhost_shared_item
+    label: "{{ vhost_shared_item.name }}"
+  tags:
+   - vhost
+  
+- name: TLS cert/key files (if needed)
+  include_role:
+    name: httpd
+    tasks_from: pki-tls
+  vars:
+    pki_hostname: "{{ vhost_shared_item.fqdn }}"
+  with_items: "{{ httpd_vhost_shared_list }}" 
+  when: 
+    - vhost_shared_item.tls is defined 
+    - vhost_shared_item.tls
+  loop_control:
+    loop_var: vhost_shared_item
+    label: "{{ vhost_shared_item.name }}"
+  tags:
+   - vhost
+
+
+- name: Installing required lib for htpasswd (if needed)
+  yum:
+    name: python3-passlib
+    state: installed
+  with_items: "{{ httpd_vhost_shared_list }}" 
+  when: 
+    - vhost_shared_item.auth_password is defined 
+    - vhost_shared_item.auth_user is defined
+    - vhost_shared_item.auth is defined
+    - vhost_shared_item.auth
+  loop_control:
+    loop_var: vhost_shared_item
+    label: "{{ vhost_shared_item.name }}"
+  run_once: True  
+  tags:
+    - htpasswd    
+
+- name: Configure htpasswd (if needed)
+  community.general.htpasswd:
+    path: "/etc/httpd/conf.d/.htpasswd-{{ vhost_shared_item.name }}"
+    name: "{{ vhost_shared_item.auth_user }}"
+    password: "{{ vhost_shared_item.auth_password }}"
+  with_items: "{{ httpd_vhost_shared_list }}" 
+  when: 
+    - vhost_shared_item.auth_password is defined 
+    - vhost_shared_item.auth_user is defined
+    - vhost_shared_item.auth is defined
+    - vhost_shared_item.auth
+  loop_control:
+    loop_var: vhost_shared_item
+    label: "{{ vhost_shared_item.name }}"
+  tags:
+    - htpasswd

@@ -1,0 +1,67 @@
+<VirtualHost *:443>
+ ServerAdmin webmaster@centos.org
+ ServerName {{ item.fqdn }}
+ DocumentRoot {{ item.path }}
+
+ Header always set Strict-Transport-Security "max-age=31536000"  
+ Header always set X-Frame-Options "SAMEORIGIN"
+ Header always set X-Xss-Protection "1; mode=block"
+ Header always set X-Content-Type-Options "nosniff"
+ Header always set Referrer-Policy "same-origin"
+
+RewriteEngine on
+
+ErrorLog logs/ssl-{{ item.fqdn }}_error.log
+TransferLog logs/ssl-{{ item.fqdn }}_access.log
+LogLevel warn
+SSLEngine on
+{{ httpd_tls_ciphers }}
+
+SSLCertificateFile /etc/pki/tls/certs/{{ item.fqdn }}.crt
+SSLCertificateKeyFile /etc/pki/tls/private/{{ item.fqdn }}.key
+SSLCertificateChainFile /etc/pki/tls/certs/{{ item.fqdn }}-CAChain.crt
+
+<Directory "{{ item.path }}">
+ AllowOverride Indexes
+  HeaderName /centos-design/header-centos.html
+  Options Indexes FollowSymLinks 
+  <IfVersion < 2.4>
+    Order allow,deny
+{% if item.acl is defined %}
+{% for allowed in item.acl %}
+    Allow from {{ allowed }}
+{% endfor %}
+{% else %}
+    Allow from all
+{% endif %}
+  </IfVersion>
+  <IfVersion >= 2.4>
+  IndexOptions FancyIndexing NameWidth=* -HTMLTable VersionSort SuppressDescription SuppressHTMLPreamble XHTML Charset=UTF-8
+{% if item.acl is defined %}
+{% for allowed in item.acl %}
+    Require ip {{ allowed }}
+{% endfor %}
+{% elif item.auth is defined %}
+    AuthType Basic
+    AuthName "Restricted Content"                                                                                  
+    AuthUserFile /etc/httpd/conf.d/.htpasswd-{{ item.name }}
+    Require valid-user
+{% else %}
+    Require all granted
+{% endif %}
+  </IfVersion>
+ </Directory>
+
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+SetEnvIf User-Agent ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog logs/ssl-{{ item.fqdn }}_request.log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>                               
+

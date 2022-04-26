@@ -5,6 +5,18 @@
  CustomLog logs/{{ item.fqdn }}_access.log combined
  ErrorLog logs/{{ item.fqdn }}_error.log
 
+# Some needed headers
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set X-Xss-Protection "1; mode=block"
+Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "same-origin"
+
+{% if item.tls is defined and item.tls %}
+RewriteEngine On
+RewriteCond $1 !^.well-known
+RewriteCond %{HTTPS} !=on
+RewriteRule ^/?(.*) https://{{ item.fqdn }}/$1 [R,L]
+{% endif %}
 
 <Directory "{{ item.path }}">
  AllowOverride Indexes
@@ -26,6 +38,11 @@
 {% for allowed in item.acl %}
     Require ip {{ allowed }}
 {% endfor %}
+{% elif item.auth is defined %}
+    AuthType Basic
+    AuthName "Restricted Content"
+    AuthUserFile /etc/httpd/conf.d/.htpasswd-{{ item.name }}
+    Require valid-user
 {% else %}
     Require all granted
 {% endif %}
