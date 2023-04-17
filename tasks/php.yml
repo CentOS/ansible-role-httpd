@@ -1,0 +1,23 @@
+
+- name: Ensuring we have default php packages installed
+  yum:
+    name:
+      - php
+      - php-xml
+      - php-mbstring
+      - php-gd
+      - php-soap
+      - php-mysqlnd 
+      - php-fpm
+    state: latest
+  tags:
+    - php 
+
+- name: Enabling PHP FPM
+  service:
+    name: php-fpm
+    state: started
+    enabled: True
+  tags:
+    - php 
+
