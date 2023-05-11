@@ -57,6 +57,8 @@ function refresh(){
     fi
   done 
   # CentOS Stream AMI IDs list from Jenkins
+  f_log "Ensuring we have checkout from git"
+  git checkout aws-images.csv >/dev/null 2>&1
   for file in https://jenkins.stream.centos.org/view/c8s%20release/job/stream8-images-ec2/lastSuccessfulBuild/artifact/ami_csv.log https://jenkins.stream.centos.org/view/c9s%20release/job/stream9-images-ec2/lastSuccessfulBuild/artifact/ami_csv.log ; do
     f_log "Refreshing content from $file ..."
     curl --silent --fail ${file} | egrep -v '^===' >> aws-images.csv
