@@ -4,13 +4,12 @@
   vars:
     pki_hostname: console.qa.centos.org
 
-- name: Configuring httpd vhost for people
+- name: Configuring httpd vhost 
   template:
     src: "{{ item }}.j2"
     dest: "/etc/httpd/conf.d/{{ item }}"
     mode: 0644
   with_items:
-    - userdir.conf
     - 02_console-qa.conf
     - ssl-console-qa.conf
   notify:
