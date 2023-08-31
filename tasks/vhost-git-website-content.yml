@@ -1,0 +1,73 @@
+# This task will just define one (or more) vhost[s] based on httpd_git_websites_list variable (list - see default/main.yml in httpd role)
+# The goal is just to compare upstream git repo hosting some content and pull if/when needed and just move to httpd docroot for that vhost
+
+- name: Install needed packages
+  yum:
+    name: 
+      - git
+      - rsync
+    state: installed
+  tags:
+    - pkgs
+
+- name: Enabling needed selinux booleans
+  seboolean:
+    name: "{{ item }}"
+    persistent: yes
+    state: on
+  with_items:
+    - httpd_can_network_connect
+
+- name: Wrapper tool to pull/copy content from git
+  template:
+    src: git-websites-content/centos_httpd_git_content.j2
+    dest: /usr/libexec/centos/centos_httpd_git_content
+    mode: 0755
+    owner: root
+  tags:
+    - script
+
+- name: Ensuring we have a staging area for git 
+  file:
+    path: /var/www/staging
+    state: directory
+
+
+- block:
+    - include_role:
+        name: httpd
+        tasks_from: pki-tls
+      vars:
+        pki_hostname: "{{ item.hostname }}"
+      with_items: "{{ httpd_git_websites_list }}"
+
+    - name: Ensuring we have a DocumentRoot
+      file:
+        path: "{{ item.local_dir }}"
+        state: directory
+        mode: 0775
+      with_items: "{{ httpd_git_websites_list }}"
+
+
+    - name: Configuring httpd vhost for "{{ item.hostname }}"
+      template:
+        src: "templates/git-websites-content/ssl-vhost-git-content.conf.j2"
+        dest: "/etc/httpd/conf.d/ssl-vhost-git-{{ item.hostname }}.conf"
+        mode: 0644
+      with_items: "{{ httpd_git_websites_list }}"
+      notify:
+        - reload_httpd
+      tags:
+        - config
+
+    - name: Cron to compare upstream git
+      cron:
+        name: "{{ item.hostname }} - pull from git"
+        job: "/usr/libexec/centos/centos_httpd_git_content {{ item.hostname }} {{ item.upstream_git_project_url }} {{ item.local_dir }} {{ item.git_public_site_dir }}"
+        minute: "*/2"
+      with_items: "{{ httpd_git_websites_list }}"
+      tags:
+        - cron
+
+
+

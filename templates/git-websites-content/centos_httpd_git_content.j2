@@ -1,0 +1,44 @@
+#!/bin/bash
+
+logfile="/var/log/centos-httpd-git-content.log"
+vhost="$1"
+git_url="$2"
+doc_root="$3"
+doc_prefix_dir="$4"
+
+if [ "$#" -ne "4" ] ; then
+  echo "usage: $basename $0 <vhost> <git_url> <doc_root> <doc_prefix_dir>"
+  exit 1
+fi
+
+
+f_log() {
+   echo "[+] $(date +%Y%m%d-%H:%M) $(basename $0) [${vhost}] -> $*" >>$logfile
+}
+
+pushd /var/www/staging >/dev/null 2>&1
+f_log "Verifying upstream git repository ${git_url}"
+if [ ! -d /var/www/staging/${vhost} ] ;then
+  f_log "Cloning first ${git_url}"
+  git clone ${git_url} ${vhost} >>$logfile 2>&1
+  pushd ${vhost} >/dev/null 2>&1
+  last_commit="new"
+else
+  pushd ${vhost} >/dev/null 2>&1
+  last_commit=$(git log| head -n 1|awk '{print $2}')
+  f_log "Updating git from ${git_url}"
+  git pull >> $logfile
+fi
+
+current_commit=$(git log| head -n 1|awk '{print $2}')
+if [ "${current_commit}" == "${last_commit}" ] ; then
+  f_log "Git head/last commit is equal [${current_commit}]"
+  f_log "Nothing to do"
+else
+  f_log "New HEAD [${current_commit}] so putting new connect content in place"
+  rsync -a --delete-after ./${doc_prefix_dir}/ ${doc_root} 
+fi
+
+popd >/dev/null 2>&1
+popd >/dev/null 2>&1
+

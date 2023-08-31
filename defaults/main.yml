@@ -267,4 +267,16 @@ httpd_copyright:
 
 httpd_vhost_shared_list: []
 
-
+#######################################################################################
+# for vhost-git-website-content.yml task
+# purpose : define a vhost that would just pull already generated content from a git url
+# It can be a list for multiple hostnames/vhosts and git upstream url
+# example:
+#
+# httpd_git_websites_list:
+#   - hostname: myvhost.mydomain.com
+#     local_dir: /var/www/docs
+#     upstream_git_project_url: https://github.com/CentOS/docs-web
+#     git_public_site_dir: '/' # can be public_site or else but from where to copy to {{ local_dir }} (docroot)
+#
+httpd_git_websites_list: []
