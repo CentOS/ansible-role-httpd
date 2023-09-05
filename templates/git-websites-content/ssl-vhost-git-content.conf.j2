@@ -34,6 +34,9 @@
  Header always set Access-Control-Allow-Origin %{origin_is}e env=origin_is
 
 RewriteEngine on
+{% if item.rewrite_rules is defined %}
+{{ item.rewrite_rules }}
+{% endif %}
 
 ErrorLog logs/ssl-{{ item.hostname }}_error.log
 TransferLog logs/ssl-{{ item.hostname }}_access.log

@@ -40,14 +40,18 @@
       vars:
         pki_hostname: "{{ item.hostname }}"
       with_items: "{{ httpd_git_websites_list }}"
-
+      loop_control:
+        label: "{{ item.hostname }}"  
+ 
     - name: Ensuring we have a DocumentRoot
       file:
         path: "{{ item.local_dir }}"
         state: directory
         mode: 0775
       with_items: "{{ httpd_git_websites_list }}"
-
+      loop_control:
+        label: "{{ item.hostname }}"  
+ 
 
     - name: Configuring httpd vhost for "{{ item.hostname }}"
       template:
@@ -57,6 +61,8 @@
       with_items: "{{ httpd_git_websites_list }}"
       notify:
         - reload_httpd
+      loop_control:
+        label: "{{ item.hostname }}"  
       tags:
         - config
 
@@ -66,6 +72,8 @@
         job: "/usr/libexec/centos/centos_httpd_git_content {{ item.hostname }} {{ item.upstream_git_project_url }} {{ item.local_dir }} {{ item.git_public_site_dir }}"
         minute: "*/2"
       with_items: "{{ httpd_git_websites_list }}"
+      loop_control:
+        label: "{{ item.hostname }}"  
       tags:
         - cron
 
