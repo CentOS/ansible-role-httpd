@@ -70,7 +70,7 @@ function refresh(){
     fi
   done 
   test -d centos || mkdir -p centos     
-  /usr/libexec/centos/rss2json.py -i https://planet.centos.org/rss20.xml -o centos/planet.json
+  /usr/libexec/centos/rss2json.py -i https://blog.centos.org/feed -o centos/planet.json
   if [ "$?" -ne "0" ] ;then
     f_log "[ERROR] Issue refreshing rss feed from planet.centos.org"
     f_log "Exiting ..."
