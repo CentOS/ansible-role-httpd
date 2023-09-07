@@ -59,11 +59,11 @@ function refresh(){
   # CentOS Stream AMI IDs list from Jenkins
   f_log "Ensuring we have checkout from git"
   git checkout aws-images.csv >/dev/null 2>&1
-  for file in https://jenkins.stream.centos.org/view/c8s%20release/job/stream8-images-ec2/lastSuccessfulBuild/artifact/ami_csv.log https://jenkins.stream.centos.org/view/c9s%20release/job/stream9-images-ec2/lastSuccessfulBuild/artifact/ami_csv.log ; do
+  for file in https://sources.stream.centos.org/artifacts/stream-ami-list.csv ; do
     f_log "Refreshing content from $file ..."
     curl --silent --fail ${file} | egrep -v '^===' >> aws-images.csv
     if [ "$?" -ne "0" ] ;then
-      f_log "[ERROR] Issue downloading file https://jenkins.stream.centos.org/"
+      f_log "[ERROR] Issue downloading file https://sources.stream.centos.org"
       f_log "Exiting ..."
       zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
       exit 1
