@@ -44,7 +44,7 @@ popd >/dev/null
 }
 
 function render(){
-  podman run --volume="${git_directory}/${sig_name}/${sig_name}-docs:/docs:z" --rm -it squidfunk/mkdocs-material build 2>&1 > /dev/null && cp -r ${git_directory}/${sig_name}/${sig_name}-docs/site/* /var/www/sigs/${sig_name}/
+  podman run --volume="${git_directory}/${sig_name}/${sig_name}-docs:/docs:z" --rm -it squidfunk/mkdocs-material build 2>&1 > /dev/null && rsync --delete-before -a ${git_directory}/${sig_name}/${sig_name}-docs/site/ /var/www/sigs/${sig_name}/
   if [ "$?" -eq "0" ] ; then
     f_log "[${sig_name}] - Rendering status : $?"
   else
