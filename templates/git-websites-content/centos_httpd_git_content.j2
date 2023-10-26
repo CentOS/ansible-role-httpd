@@ -36,7 +36,7 @@ if [ "${current_commit}" == "${last_commit}" ] ; then
   f_log "Nothing to do"
 else
   f_log "New HEAD [${current_commit}] so putting new connect content in place"
-  rsync -a --delete-after ./${doc_prefix_dir}/ ${doc_root} 
+  rsync -a --delete-after --filter '- .git' ./${doc_prefix_dir}/ ${doc_root} 
 fi
 
 popd >/dev/null 2>&1
