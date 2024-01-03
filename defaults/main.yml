@@ -12,10 +12,16 @@ httpd_tls_ciphers: |
   SSLHonorCipherOrder     off
 
 # Central LetsEncrypt node for the cerbot redirection
+httpd_redirect_acmechallenge: True
 httpd_certbot_fqdn: certbot.domain.com
 
 # Apache httpd settings (see https://httpd.apache.org/docs/current/mod/mpm_common.html)
 httpd_maxrequestworkers: 512
+
+# snippet that can be injected into 01_common.conf
+httpd_common_snippet: |
+  # This is a snippet block coming from ansible inventory
+
 
 # Page information
 httpd_html_autoindex_title: "CentOS"

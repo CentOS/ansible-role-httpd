@@ -6,11 +6,12 @@ AddType application/octet-stream .qcow2c
 
 
 NameVirtualHost *:80
+{% if httpd_redirect_acmechallenge %}
 # By default allowing redirecting to central node for LetsEncrypt certbot validation
  <Location "/.well-known/acme-challenge/">
-     ProxyPass "http://cephas.centos.org/.well-known/acme-challenge/"
+     ProxyPass "http://{{ httpd_certbot_fqdn }}/.well-known/acme-challenge/"
  </Location>
-
+{% endif %}
 # Default Header
 Alias /header /var/www/centos/header
 Alias /centos-design /var/www/centos-design
@@ -32,3 +33,5 @@ ErrorDocument 404 {{ httpd_common_alias }}/404.html
     MaxConnectionsPerChild    {{ httpd_maxrequestworkers * 5 }}
 </IfModule>
 
+# Custom snippet if declared as ansible httpd_common_snippet block
+{{ httpd_common_snippet }}
