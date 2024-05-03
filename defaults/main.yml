@@ -15,6 +15,14 @@ httpd_tls_ciphers: |
 httpd_redirect_acmechallenge: True
 httpd_certbot_fqdn: certbot.domain.com
 
+# Which apache/http MPM (Multi-processing Module) should we load
+#  mpm_prefork: http://httpd.apache.org/docs/2.4/mod/prefork.html
+#  mpm_worker: http://httpd.apache.org/docs/2.4/mod/worker.html
+#  mpm_event: http://httpd.apache.org/docs/2.4/mod/event.html
+# Can be overwritten per host/group vars 
+# logic is to use set_fact to define a default one if nothing is defined through inventory
+# and reuse operating system/RHEL default value
+
 # Apache httpd settings (see https://httpd.apache.org/docs/current/mod/mpm_common.html)
 httpd_maxrequestworkers: 512
 

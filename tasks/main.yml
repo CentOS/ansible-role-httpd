@@ -1,3 +1,33 @@
+
+- name: Importing specific distro variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+  tags:
+    - vars
+    - always
+
+- name: Default mpm module based on EL distribution (default)
+  block:
+    - name: Setting default mpm module to prefork for RHEL 7 and below
+      set_fact:
+        httpd_mpm_module: mpm_prefork
+      when:
+        - httpd_mpm_module is not defined
+        - ansible_distribution_major_version|int < 8
+
+    - name: Setting default mpm module to event for RHEL 8 and beyond
+      set_fact:
+        httpd_mpm_module: mpm_event
+      when:
+        - httpd_mpm_module is not defined
+        - ansible_distribution_major_version|int > 7
+  tags:
+    - vars
+    - always
+    - mpm
+
 - name: Ensuring httpd is installed
   yum: 
     name: httpd 
@@ -83,6 +113,23 @@
 - include_tasks: tls.yml
   when: httpd_tls
 
+- block:
+    - name: Configuring httpd mpm mode
+      template:
+        src: 00-mpm.conf.j2
+        dest: /etc/httpd/conf.modules.d/00-mpm.conf
+        mode: '0644'
+        owner: root
+      notify:
+        - restart_httpd
+        
+    - name: Configuring correct selinux boolean for mpm
+      seboolean:
+        name: httpd_graceful_shutdown
+        state: True
+        persistent: True
+  tags:
+    - mpm
 
 - block:
     - name: Ensure we have mod_qos pkg installed

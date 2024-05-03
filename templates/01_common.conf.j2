@@ -26,12 +26,10 @@ Alias "{{ httpd_common_alias }}" "{{ httpd_common_directory }}"
 # Some customized ErrorDocument files
 ErrorDocument 404 {{ httpd_common_alias }}/404.html
 
-# Prefork tuning
-<IfModule mpm_prefork_module>
-    ServerLimit               {{ httpd_maxrequestworkers * 1.5 }}
-    MaxRequestWorkers         {{ httpd_maxrequestworkers }}
-    MaxConnectionsPerChild    {{ httpd_maxrequestworkers * 5 }}
-</IfModule>
+# mpm module tuning (common for prefork, worker, event modes)
+ServerLimit               {{ httpd_maxrequestworkers * 1.5 }}
+MaxRequestWorkers         {{ httpd_maxrequestworkers }}
+MaxConnectionsPerChild    {{ httpd_maxrequestworkers * 5 }}
 
 # Custom snippet if declared as ansible httpd_common_snippet block
 {{ httpd_common_snippet }}
