@@ -46,16 +46,6 @@ popd >/dev/null
 
 function refresh(){
   pushd ${git_directory}/centos.org/_data >/dev/null
-  for file in full-mirrorlist.csv full-altarchlist.csv ; do
-    f_log "Refreshing content for file $file ..."
-    curl --silent --fail -O https://mirror-status.centos.org/${file}
-    if [ "$?" -ne "0" ] ;then
-      f_log "[ERROR] Issue downloading file https://mirror-status.centos.org/${file}"
-      f_log "Exiting ..."
-      zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
-      exit 1
-    fi
-  done 
   # CentOS Stream AMI IDs list from Jenkins
   f_log "Ensuring we have checkout from git"
   git checkout aws-images.csv >/dev/null 2>&1
