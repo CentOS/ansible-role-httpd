@@ -10,6 +10,9 @@
  Header always set Referrer-Policy "same-origin"
 
 RewriteEngine on
+{% if item.rewrite_rules is defined %}
+{{ item.rewrite_rules }}                                                                                           
+{% endif %}   
 
 ErrorLog logs/ssl-{{ item.fqdn }}_error.log
 TransferLog logs/ssl-{{ item.fqdn }}_access.log
