@@ -7,15 +7,39 @@
   vars:
     pki_hostname: www.stg.centos.org
 
-- name: Adding specific webcontent user[s]
-  user: 
-    name: '{{ item.name }}' 
-    state: present 
-    comment: "CentOS Web content user for branch {{ item.branch }}"
-    groups: centos
-    append: True
-  with_items: "{{ httpd_www_local_users }}"  
-  
+- block:
+    - name: Adding specific webcontent user[s]
+      user: 
+        name: '{{ item.name }}' 
+        state: present 
+        comment: "CentOS Web content user for branch {{ item.branch }}"
+      with_items: "{{ httpd_www_local_users }}" 
+    
+    - name: Enabling systemd linger for user
+      command:
+        cmd: "loginctl enable-linger {{ item.name }}"
+        creates: "/var/lib/systemd/linger/{{ item.name }}"
+      with_items: "{{ httpd_www_local_users }}" 
+
+    - name: Creating needed ssh home dir
+      file:
+        path: "/home/{{ item.name }}/.ssh"
+        state: directory
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: '0700'
+      with_items: "{{ httpd_www_local_users }}"
+    - name: Importing needed ssh key (if defined)
+      copy:
+        src: "{{ pkistore }}/ssh/{{ item.ssh_key }}"
+        dest: "/home/{{ item.name }}/.ssh/id_rsa"
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: '0600'
+      with_items: "{{ httpd_www_local_users }}"
+      when:  item.ssh_key is defined
+  tags: 
+    - users
 
 - name: Ensuring we have a DocumentRoot
   file:

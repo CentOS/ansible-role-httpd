@@ -17,16 +17,32 @@ function usage() {
 cat << EOF
 You need to call the script like this : $0 <action> <branch>
 <action> can be one of the following:
- init			: prepares local jekyll container and git initial clone
- build		: verify upstream git and rebuild if different
- refresh	: download from external sources content like .csv files to update website<
-<branch> can be master or staging 
+ init	 : prepares local jekyll container and git initial clone
+ build	 : verify upstream git and rebuild if different
+ refresh : download from external sources content like .csv files to update website
+<branch> can be main/staging 
 
 EOF
 }
 
 f_log() {
    echo "[+] $(date +%Y%m%d-%H:%M) $(basename $0) -> $*" >>$logfile
+}
+
+# Checking if container path/tag is specified in git itself otherwise just using legacy one (jekyll/jekyll)
+function container_check() {
+  if [ -e ${git_directory}/centos.org/container.specs ] ; then
+    source ${git_directory}/centos.org/container.specs
+    volumes_args="--volume=${git_directory}/centos.org:/site:z"
+    jekyll_build_cli="bundle exec jekyll build --config /site/_config.yml -s /site -d /site/_site/"
+  else
+    container_tag="latest"
+    container_path="docker.io/jekyll/jekyll"
+    volumes_args="--volume=${git_directory}/centos.org:/srv/jekyll:z --volume=${git_directory}/centos.org/vendor/bundle:/usr/local/bundle:z"
+    jekyll_build_cli="jekyll build"
+  fi
+  {% raw %}podman images --format "{{.Repository}}:{{.Tag}}"|grep -q ${container_path}:${container_tag} || podman pull ${container_path}:${container_tag} {% endraw %}
+
 }
 
 function init(){
@@ -36,15 +52,16 @@ function init(){
   pushd centos.org >> $logfile ; git checkout ${git_branch} >> $logfile ; popd >> $logfile
   for i in .jekyll-cache vendor vendor/bundle _site ; do 
     podman unshare mkdir -p ${git_directory}/centos.org/${i}
-    podman unshare chown -R 1000:1000 ${git_directory}/centos.org/${i}
+    podman unshare chown -R ${UID}:${UID} ${git_directory}/centos.org/${i}
   done
-  podman unshare chown -R 1000:1000 ${git_directory}/centos.org/Gemfile.lock
-  podman images |grep -q jekyll || podman run --volume="${git_directory}/centos.org:/srv/jekyll:z" --volume="${git_directory}/centos.org/vendor/bundle:/usr/local/bundle:z" --rm -it jekyll/jekyll bundle update >>$logfile
-popd >/dev/null
+  podman unshare chown -R ${UID}:${UID} ${git_directory}/centos.org/Gemfile.lock
+  container_check
+  popd >/dev/null
   refresh
 }
 
 function refresh(){
+  container_check
   pushd ${git_directory}/centos.org/_data >/dev/null
   # CentOS Stream AMI IDs list from Jenkins
   f_log "Ensuring we have checkout from git"
@@ -72,27 +89,27 @@ function refresh(){
 }
 
 function render(){
-  podman run --volume="${git_directory}/centos.org:/srv/jekyll:z" --volume="${git_directory}/centos.org/vendor/bundle:/usr/local/bundle:z" --rm -it jekyll/jekyll jekyll build 2>&1 > /dev/null 
+  podman run ${volumes_args} --rm -it ${container_path}:${container_tag} ${jekyll_build_cli} 2>&1 > /dev/null 
   if [ "$?" -eq "0" ] ; then
     f_log "Rendering status : $?"
     if [ "${git_branch}" == "staging" ] ; then
       f_log "git branch is [${git_branch}] so copying locally"
-      cp -r ${git_directory}/centos.org/_site/* /var/www/centos_website/
+      rsync -aH --delete-after ${git_directory}/centos.org/_site/* /var/www/centos_website/
     else
       f_log "git branch is [${git_branch}] so pushing live to www nodes"
       if [ -z "${web_servers}" ] ; then
-        f_log "Empty web servers list to nowhere to push, skipping"
+        f_log "Empty web servers list so nowhere to push, skipping"
       else
-				for node in ${web_servers}; do
-					f_log "Pushing content to $node .."
-					rsync -aH --delete-after  ${git_directory}/centos.org/_site/ wwwpush@${node}:/var/www/centos_website/ >/dev/null 2>&1 
-					if [ "$?" -ne "0" ] ; then
-						f_log "[ERROR] Error pushing to target ${node}."
-						f_log "Exiting process"
-						zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
-						exit 1
-					fi 
-				done
+        for node in ${web_servers}; do
+	  f_log "Pushing content to $node .."
+	  rsync -aH --delete-after  ${git_directory}/centos.org/_site/ wwwpush@${node}:/var/www/centos_website/ >/dev/null 2>&1 
+	  if [ "$?" -ne "0" ] ; then
+	    f_log "[ERROR] Error pushing to target ${node}."
+	    f_log "Exiting process"
+	    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
+	    exit 1
+	  fi 
+	done
       fi
     fi
   else

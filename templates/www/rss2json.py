@@ -7,7 +7,7 @@ import json
 import requests
 import sys
 import logging
-logging.basicConfig(level=logging.INFO, filename='/var/tmp/rss2json.log', filemode='a', format='%(asctime)s - %(message)s')
+import os
 
 def main():
   try:		 
@@ -23,7 +23,9 @@ def main():
     args = parser.parse_args()
     rss_file = args.input
     json_file = args.output
+    log_file="%s/rss2json.log" % os.environ["HOME"]
 
+    logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a', format='%(asctime)s - %(message)s') 
     rss_feed = requests.get(rss_file)
     if rss_feed.status_code == requests.codes.ok: 
       json_entries = json.dumps(feedparser.parse(rss_feed.text).entries, ensure_ascii=False)
