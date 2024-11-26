@@ -94,7 +94,7 @@ function render(){
     f_log "Rendering status : $?"
     if [ "${git_branch}" == "staging" ] ; then
       f_log "git branch is [${git_branch}] so copying locally"
-      rsync -aH --delete-after ${git_directory}/centos.org/_site/* /var/www/centos_website/
+      rsync -aH --delete-after ${git_directory}/centos.org/_site/ /var/www/centos_website/
     else
       f_log "git branch is [${git_branch}] so pushing live to www nodes"
       if [ -z "${web_servers}" ] ; then
