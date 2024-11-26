@@ -72,7 +72,7 @@ function refresh(){
     if [ "$?" -ne "0" ] ;then
       f_log "[ERROR] Issue downloading file https://sources.stream.centos.org"
       f_log "Exiting ..."
-      zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
+      zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render.${git_branch} -o 1 >/dev/null
       exit 1
     fi
   done 
@@ -81,7 +81,7 @@ function refresh(){
   if [ "$?" -ne "0" ] ;then
     f_log "[ERROR] Issue refreshing rss feed from blog.centos.org"
     f_log "Exiting ..."
-    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
+    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render.${git_branch} -o 1 >/dev/null
     exit 1
   fi 
   popd >/dev/null
@@ -106,7 +106,7 @@ function render(){
 	  if [ "$?" -ne "0" ] ; then
 	    f_log "[ERROR] Error pushing to target ${node}."
 	    f_log "Exiting process"
-	    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
+	    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render.${git_branch} -o 1 >/dev/null
 	    exit 1
 	  fi 
 	done
@@ -114,7 +114,7 @@ function render(){
     fi
   else
     f_log "[ERROR] issue detected when building website"
-    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 1 >/dev/null
+    zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render.${git_branch} -o 1 >/dev/null
   fi
 }
 
@@ -149,5 +149,5 @@ else
 fi
 
 # If we made it here, that means all was ok so updating zabbix status
-zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render -o 0 >/dev/null
+zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render.${git_branch} -o 0 >/dev/null
 exit 0
