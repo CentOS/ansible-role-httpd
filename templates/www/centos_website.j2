@@ -34,21 +34,21 @@ function container_check() {
   if [ -e ${git_directory}/centos.org/container.specs ] ; then
     source ${git_directory}/centos.org/container.specs
     volumes_args="--volume=${git_directory}/centos.org:/site:z"
-    jekyll_build_cli="bundle exec jekyll build --config /site/_config.yml -s /site -d /site/_site/"
+    jekyll_build_cli="bundle exec jekyll build --config /site/_config-${git_branch}.yml -s /site -d /site/_site/"
   else
     container_tag="latest"
     container_path="docker.io/jekyll/jekyll"
     volumes_args="--volume=${git_directory}/centos.org:/srv/jekyll:z --volume=${git_directory}/centos.org/vendor/bundle:/usr/local/bundle:z"
     jekyll_build_cli="jekyll build"
   fi
-  {% raw %}podman images --format "{{.Repository}}:{{.Tag}}"|grep -q ${container_path}:${container_tag} || podman pull ${container_path}:${container_tag} {% endraw %}
+  {% raw %}podman images --format "{{.Repository}}:{{.Tag}}"|grep -q ${container_path}:${container_tag} || podman pull ${container_path}:${container_tag} >> $logfile 2>&1 {% endraw %} 
 
 }
 
 function init(){
   test -d ${git_directory} || mkdir -p ${git_directory}
   pushd ${git_directory} >/dev/null
-  test -d centos.org || git clone ${git_upstream} >> $logfile
+  test -d centos.org || git clone ${git_upstream} >> $logfile 2>&1
   pushd centos.org >> $logfile ; git checkout ${git_branch} >> $logfile ; popd >> $logfile
   for i in .jekyll-cache vendor vendor/bundle _site ; do 
     podman unshare mkdir -p ${git_directory}/centos.org/${i}
@@ -65,7 +65,7 @@ function refresh(){
   pushd ${git_directory}/centos.org/_data >/dev/null
   # CentOS Stream AMI IDs list from Jenkins
   f_log "Ensuring we have checkout from git"
-  git checkout aws-images.csv >/dev/null 2>&1
+  git checkout aws-images.csv >> $logfile 2>&1
   for file in https://sources.stream.centos.org/artifacts/stream-ami-list.csv ; do
     f_log "Refreshing content from $file ..."
     curl --silent --fail ${file} | egrep -v '^===' >> aws-images.csv
@@ -89,11 +89,11 @@ function refresh(){
 }
 
 function render(){
-  podman run ${volumes_args} --rm -it ${container_path}:${container_tag} ${jekyll_build_cli} 2>&1 > /dev/null 
+  podman run ${volumes_args} --rm -it ${container_path}:${container_tag} ${jekyll_build_cli} >> $logfile 2>&1
   if [ "$?" -eq "0" ] ; then
-    f_log "Rendering status : $?"
+    f_log "Rendering status : $? "
     if [ "${git_branch}" == "staging" ] ; then
-      f_log "git branch is [${git_branch}] so copying locally"
+      f_log "git branch is [${git_branch}] so copying locally to /var/www/centos_website/"
       rsync -aH --delete-after ${git_directory}/centos.org/_site/ /var/www/centos_website/
     else
       f_log "git branch is [${git_branch}] so pushing live to www nodes"
@@ -115,14 +115,15 @@ function render(){
   else
     f_log "[ERROR] issue detected when building website"
     zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -k podman.render.${git_branch} -o 1 >/dev/null
+    exit 1
   fi
 }
 
 function build(){
   pushd ${git_directory}/centos.org >/dev/null
-  git checkout ${git_branch} >>$logfile
+  git checkout ${git_branch} >> $logfile 2>&1
   last_commit=$(git log| head -n 1|awk '{print $2}')
-  git pull origin ${git_branch}>/dev/null
+  git pull origin ${git_branch} >> $logfile 2>&1
   current_commit=$(git log| head -n 1|awk '{print $2}')
   popd >/dev/null
 

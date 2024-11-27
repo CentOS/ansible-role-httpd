@@ -98,13 +98,13 @@
     dest: /usr/libexec/centos/centos_website
     mode: 0755
     owner: root
-  register: centos_website_script
   tags:
     - script
 
 - name: Init podman containers
-  command: "/usr/libexec/centos/centos_website init {{ item.branch }}"
-  when: centos_website_script is changed
+  command: 
+    cmd: "/usr/libexec/centos/centos_website init {{ item.branch }}"
+    creates: "/home/{{ item.name }}/git"
   become_user: "{{ item.name }}"
   with_items: "{{ httpd_www_local_users }}"
   tags:
