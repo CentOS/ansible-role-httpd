@@ -10,7 +10,7 @@ action="$1"
 git_branch="$2"
 web_servers="{{ httpd_www_servers }}" # servers to push content to
 git_upstream="{{ httpd_www_git_upstream }}" # Where to git clone/pull from
-git_directory="${HOME}/git/"
+git_directory="${HOME}/git"
 logfile="${HOME}/centos_website-${git_branch}.log"
 
 function usage() {
@@ -89,7 +89,8 @@ function refresh(){
 }
 
 function render(){
-  podman run ${volumes_args} --rm -it ${container_path}:${container_tag} ${jekyll_build_cli} >> $logfile 2>&1
+  container_check
+  podman run --rm -it ${volumes_args} ${container_path}:${container_tag} ${jekyll_build_cli} >> $logfile 2>&1
   if [ "$?" -eq "0" ] ; then
     f_log "Rendering status : $? "
     if [ "${git_branch}" == "staging" ] ; then
