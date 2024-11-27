@@ -1,8 +1,14 @@
 - import_role:
+    name: podman-host
+  vars:
+    podman_rootless: True
+    podman_rootless_users: "{{ httpd_docs_username | split(',') }}"
+    
+- import_role:
     name: httpd
     tasks_from: pki-tls
   vars:
-    pki_hostname: docs.centos.org
+    pki_hostname: "{{ httpd_docs_hostname }}"
 
 - name: Configuring httpd vhost for people
   template:
@@ -17,8 +23,38 @@
 
 - name: Ensuring we have a docroot
   file:
-    path: /var/www/docs.centos.org
+    path: "/var/www/{{ httpd_docs_hostname }}"
     state: directory
+    owner: "{{ httpd_docs_username }}"
+    group: "{{ httpd_docs_username }}"
+
+- block:
+    - name: Ensuring needed pkgs are installed
+      yum:
+        name: "{{ httpd_docs_pkgs_list }}"
+        state: installed
+
+    - name: Needed script to call mkdocs container
+      template:
+        src: docs/mkdocs-centos.j2
+        dest: /usr/libexec/centos/mkdocs-centos
+        mode: '0755'  
+
+    - name: Init git and podman 
+      command: 
+        cmd: "/usr/libexec/centos/mkdocs-centos init"
+        creates: "/home/{{ httpd_docs_username }}/git"
+      become_user: "{{ httpd_docs_username }}"
+
+    - name: Cron to compare upstream git
+      cron:
+        name: mkdocs-centos render job
+        job: "/usr/libexec/centos/mkdocs-centos build"
+        minute: "*/2"
+        user: "{{ httpd_docs_username }}"
+    
+  tags:
+    - mkdocs
 
 - name: Enabling needed selinux booleans
   seboolean:
@@ -35,7 +71,7 @@
   vars:
     - centos_role: httpd-doc
     - role_backup_folders:
-        - /var/www/docs.centos.org
+        - "/var/www/{{ httpd_docs_hostname }}"
   tags:
     - backup
    

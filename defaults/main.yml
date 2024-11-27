@@ -311,3 +311,22 @@ httpd_vhost_shared_list: []
 #       RedirectMatch temp "^/(Download|Promote|ReportBugs|SpecialInterestGroup|Donate)$" "/$1.html"
 #       RedirectMatch temp "^/HowTos/(.*)$" "/HowTos(2f)$1.html"
 httpd_git_websites_list: []
+
+
+######################################################################################
+# for vhost-docs.yml task
+# purpose : setup a vhost that will pull content from various docs git repositories 
+# and render through mkdocs-centos container (mkdocs and plugins in one container)
+# We can define some variables for this (default) and override if needed
+httpd_docs_hostname: docs.centos.org
+httpd_docs_username: mkdocsbot
+# where to find container and which tag
+httpd_docs_container: quay.io/centosci/mkdocs-centos
+httpd_docs_container_tag: 1.6.1
+# how to call mkdocs-centos cmd through podman
+httpd_docs_mkdocs_buildcmd: build
+httpd_docs_pkgs_list:
+  - git
+# From which repository we need to pull from  
+httpd_docs_git_url: https://gitlab.com/CentOS/docs/docs.centos.org.git
+
