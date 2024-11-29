@@ -1,0 +1,5 @@
+<div class="row my-3">
+  <div class="col">Copyright &copy; {{ httpd_common_copyright.year }} {{ httpd_common_copyright.author }} {%  for item in httpd_common_copyright.legals -%}<a href="{{ item.link }}" class="border-start ms-2 ps-2 link-light link-offset-3 link-offset-3-hover link-underline-light link-underline-opacity-25 link-underline-opacity-75-hover">{{ item.text }}</a>
+{%- endfor -%}
+  </div>
+</div>

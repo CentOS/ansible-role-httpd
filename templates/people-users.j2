@@ -1,27 +1,12 @@
-{% with %}
-{# --- Header template configuration --------------------------- #}
-{% set title = "People of CentOS" %}
-{% set title_lead = "This is an area where the CentOS Developers and allowed contributors can make test files and other things available that are not yet part of CentOS. Some items here will make it into CentOS, CentOS Extras and/or CentOS Plus ... while other things may not." %}
-{% set alerts = [{
-  'title': '<i class="fas fa-exclamation-triangle"></i> Caution:',
-  'class': 'alert alert-danger',
-  'message': 'Use anything here at your own risk!'
-  }]
-%}
-{% set paragraphs = [
-  'The following users currently have areas on people.centos.org: (sorted by First name)'
-  ]
-%}
 {# --- Header template ----------------------------------------- #}
-{% include "common/header.html.j2" %}
-{% endwith %}
+{% include "common/page-header.html.j2" %}
 
 {# --- Body ---------------------------------------------------- #}
 <ul class="list-group list-group-flush">
-{% for user in people_users|sort(attribute='full_name') %}
+{% for user in people_users | sort(attribute='full_name') %}
 <li class="list-group-item"><a href="/{{ user.login_name }}/">{{ user.full_name }} ({{ user.login_name }})</a></li>
 {% endfor %}
 </ul>
 
 {# --- Footer -------------------------------------------------- #}
-{% include "common/footer.html.j2" %}
+{% include "common/page-footer.html.j2" %}

@@ -1,0 +1,32 @@
+{% include "common/page-head.html.j2" %}
+
+<body id="top" class="bg-dots">
+
+{% include "common/page-navbar.html.j2" %}
+
+<main class="container bg-body p-3">
+  <div class="row align-items-center small mb-3">
+    <div class="col">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-25 link-underline-opacity-75-hover" href="https://www.{{ httpd_www_domain }}">Home</a></li>
+          <li class="breadcrumb-item"><a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-25 link-underline-opacity-75-hover" href="https://{{ httpd_people_hostname }}">People of CentOS</a></li>
+          <li class="breadcrumb-item active">{{ item.login_name }}</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+  <div class="row justify-content-center my-5">
+    <div class="col">
+      <div class="h1">{{ item.login_name }}</div>
+      <div class="lead">{{ item.full_name }}</div>
+    </div>
+  </div>
+  <div class="row justify-content-center mb-4">
+    <div class="col content">
+
+      {% if page.with_content | length > 0 %}
+      {% for item in page.with_content %}
+      <{{ item.element }}{% if item.element_class is defined %} class="{{ item.element_class }}"{% endif %}>{{ item.element_content }}</{{ item.element }}>
+      {% endfor %}
+      {% endif %}

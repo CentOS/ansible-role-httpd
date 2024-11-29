@@ -1,0 +1,70 @@
+{% macro print_section(section, width) %}
+<div class="col-xs-12 col-sm-6 col-lg-{{ width }} my-3">
+  <h6 class="fw-bold"><i class="{{ section.icon }}"></i> {{ section.name }}</h6>
+  <ul class="nav flex-column">
+    {% for item in section.menu -%}
+    <li class="nav-item"><a href="{{ httpd_common_assets }}{{ item.link }}" class="link-light px-0">{{ item.name }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+{%- endmacro %}
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer small bg-dark bg-image text-light">
+  {% if page.with_shortcuts != false %}
+  <div class="container">
+    <div class="row bg-primary text-light">
+      {% for section in httpd_common_navbar if "footer" in section.visible_on %}
+      {% set sections = [] %}
+      {% set sections = sections.append(section) %}
+      {% endfor %}
+
+      {% if sections is defined %}
+      {% set columns = sections | length | string %}
+
+      {% if columns == "1" %}
+        {% set width = "12" %}
+      {% elif columns == "2" %}
+        {% set width = "6" %}
+      {% elif columns == "3" %}
+        {% set width = "4" %}
+      {% elif columns == "4" %}
+        {% set width = "3" %}
+      {% else %}
+        {% set width = "1" %}
+      {% endif %}
+
+      {% for section in sections -%}
+      {{ print_section(section, width)}}
+      {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if page.with_finale != false %}
+  <div class="container border-5 border-top border-primary">
+  {{ lookup('template', "templates/common/page-footer-finale.html.j2") }}
+  </div>
+  {% endif %}
+
+  {% if page.with_sponsors != false %}
+  <div class="container-fluid bg-light">
+    <div class="container">
+    </div>
+  </div>
+  {% endif %}
+
+  {% if page.with_copyright != false %}
+  <div class="container py-1">
+    {{ lookup('template', "templates/common/page-footer-copyright.html.j2") }}
+  </div>
+  {% endif %}
+</footer>
+
+{{ lookup('template', "templates/common/page-footer-script.html.j2") }}
+</body>
+</html>

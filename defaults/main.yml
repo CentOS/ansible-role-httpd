@@ -6,7 +6,7 @@ httpd_public: True
 httpd_tls: False
 # If using TLS, which are the protocols/ciphers we can to apply
 httpd_tls_ciphers: |
-  # https://ssl-config.mozilla.org/#server=apache&version=2.4.6&config=intermediate&openssl=1.0.2k&guideline=5.6 
+  # https://ssl-config.mozilla.org/#server=apache&version=2.4.6&config=intermediate&openssl=1.0.2k&guideline=5.6
   SSLProtocol             all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
   SSLCipherSuite          ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305
   SSLHonorCipherOrder     off
@@ -19,7 +19,7 @@ httpd_certbot_fqdn: certbot.domain.com
 #  mpm_prefork: http://httpd.apache.org/docs/2.4/mod/prefork.html
 #  mpm_worker: http://httpd.apache.org/docs/2.4/mod/worker.html
 #  mpm_event: http://httpd.apache.org/docs/2.4/mod/event.html
-# Can be overwritten per host/group vars 
+# Can be overwritten per host/group vars
 # logic is to use set_fact to define a default one if nothing is defined through inventory
 # and reuse operating system/RHEL default value
 
@@ -42,7 +42,7 @@ httpd_html_autoindex_content: ""
 # Some settings for included apache httpd modules
 # These will be configured system-wide/global and not per vhost
 httpd_mod_qos: False
-# If we have it to True, we can just inject snippet for mod_qos 
+# If we have it to True, we can just inject snippet for mod_qos
 # See http://mod-qos.sourceforge.net/ for possible settings
 httpd_mod_qos_snippet: |
   QS_Status on
@@ -97,7 +97,7 @@ httpd_docs_sigs_list: []
 # For www task
 httpd_www_rootdir: /var/www/centos_website
 httpd_www_hostname: www.centos.org
-httpd_www_aliases: 
+httpd_www_aliases:
   - centos.org
 httpd_www_push_users:
   - login_name: wwwpush
@@ -105,7 +105,7 @@ httpd_www_push_users:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDRL1TUUwizrKopU5AOvJR6jCBAIA41Jr5nAZBZT3gQQAzEETgxeDJXGfiG9vZnfNMZuVoiomgxl+u8HaiyKV8CiXOiE/Afj+6qsdmbUlAkOCs+rAHoFiaSmkKP8gC7yMeBAO22FRDH/P+OAHOwFxvcaeOKb86xHPlRePOMABRWZBpdUNYUOE2ZD6jn2ywnhxAr2BLOmFKbIJsMirvQS3v4qbjyzmcyje4qnw9Ypen79VGz/FukEc8tJKhrD5dvncNEcdA0WJ/4fjHv30fpeAkil3ChSkH5u0d8DESoBba21f6SySYlAwJmZVUM3Orb4hgMkP+JXIvL/UcZMyC7pEmFwMGXcsQigInwLj3RMZ6CKbZ6VTtcYEGZ4h7uD8YJNwGsdDcWYFOnyIZmsY1KrQ4oIBv3WBo29VcdzoyZaatnieQFa5mc+mO7WWdGHp/rd1r0OdhjbgbgjViTGaiVN+YDXWth7GBgvEVQrWZRmYGOmbKyJQgv25lFpQvRLw5WSPP3uEoXVLk3KpoPUckMd2i5N8HutaF16psP0MaAx3NxoRFPHI/+ko5LY3pNcIQtAwmIRbmvdit7KZkF3SBwxZ5bET/XdlviOkT9HtGDhNoEZ6ESIK4RyLIlHbXsDWFu2nkGNlTcv4EJxFHrsoaPW323sdsjhSgeB8Ip0587Tp5imQ==
 
 # www staging task where website is rendered
-httpd_www_local_users: 
+httpd_www_local_users:
   - name: centos
     branch: main
   - name: centos_staging
@@ -155,24 +155,24 @@ httpd_common_alias: "/common"
 httpd_common_directory: "/var/www/common"
 
 # ===============================================================================
-# httpd_assets_url - Set assets url (without trailing slash).
+# httpd_common_assets - Set assets url (without trailing slash).
 #
 # Here is were css, images and js files will be retrieved from. This is
-# normally "https://www.centos.org" in production and
-# "https://www.dev.centos.org" in development. When we change the main site
-# design all other sites based on it will be changed as well and there won't be
-# necessary to maintain separated files. In order for this to work, origin
-# domains must be specified in httpd_www_cors option.
+# normally "https://www.centos.org" in production, "https://www.stg.centos.org"
+# in staging and "https://www.dev.centos.org" in development. When we change
+# the main site design, all other sites based on it will be changed as well and
+# it won't be necessary to maintain separated files. In order for this to work,
+# origin domains must be specified in httpd_www_cors option.
 #
 # This variable should be defined in a high scope location (e.g., under
 # `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
 # playbooks you run can take advantage of it reducing the number of places you
 # need to change.
 # ===============================================================================
-httpd_assets_url: "https://www.centos.org"
+httpd_common_assets: "https://www.centos.org"
 
 # ===============================================================================
-# httpd_navbar - Set website navigation bar.
+# httpd_common_navbar - Set website navigation bar.
 #
 # The navigation bar is visible on the very top of each CentOS website, where
 # the CentOS logo and the top-level-always-visible links are placed. The navbar
@@ -180,80 +180,125 @@ httpd_assets_url: "https://www.centos.org"
 # default are hidden and are visible when the user clicks the item that has the
 # arrow pointing down on right side.
 #
-# The navigation bar the httpd_navbar variable defines is re-used in different
-# website templates (e.g., mailman, wordpress-theme).  For consistency, it must
-# match the content the `_data/centos/navbar.yml` file provides in
-# www.centos.org site.
+# The navigation bar the httpd_common_navbar variable defines is re-used in
+# different website templates.  For consistency, it must match the content the
+# `_data/base/navbar.yml` file provides in www.centos.org site.
 #
 # This variable should be defined in a high scope location (e.g., under
 # `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
 # playbooks you run can take advantage of it reducing the number of places you
 # need to change.
 #
-# When you define link inside the navbar, use `httpd_assets_url` variable as
-# much as possible to keep navigability among different environments (e.g.,
-# www.dev.centos.org and www.centos.org).  See `httpd_assets_url` block in this
-# file to know more.
+# When you define a link inside the navbar, use `httpd_common_assets` variable
+# as much as possible to keep navigability among different environments (e.g.,
+# www.dev.centos.org and www.centos.org).
+#
+# Related resources:
+# - https://centos.gitlab.io/artwork/centos-web/jekyll-theme-centos-base/documentation/page-layout/navbar/
 # ===============================================================================
-httpd_navbar:
+httpd_common_navbar:
   - name: "Download"
     icon: "fas fa-download"
-    link: "{{ httpd_assets_url }}/download"
+    link: "{{ httpd_common_assets }}/download"
     menu: []
+    visible_on: ["navbar"]
   - name: "About"
     icon: "fas fa-info-circle"
     link: "#"
     menu:
       - name: "About CentOS"
-        link: "{{ httpd_assets_url }}/about"
+        link: "{{ httpd_common_assets }}/about"
       - name: "Frequently Asked Questions (FAQs)"
         link: "https://wiki.centos.org/FAQ"
       - name: "Special Interest Groups (SIGs)"
         link: "https://wiki.centos.org/SpecialInterestGroups"
       - name: "CentOS Variants"
-        link: "{{ httpd_assets_url }}/variants"
+        link: "{{ httpd_common_assets }}/variants"
       - name: "Governance"
-        link: "{{ httpd_assets_url }}/about/governance"
+        link: "{{ httpd_common_assets }}/about/governance"
       - name: "Code of Conduct"
-        link: "{{ httpd_assets_url }}/code-of-conduct"
+        link: "{{ httpd_common_assets }}/code-of-conduct"
+    visible_on: ["navbar"]
 
 # ===============================================================================
-# httpd_social - List of links to social networks.
+# httpd_common_social - List of links to social networks.
 #
 # This variable should be defined in a high scope location (e.g., under
 # `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
 # playbooks you run can take advantage of it reducing the number of places you
 # need to change.
+#
+# Related resources:
+# - https://centos.gitlab.io/artwork/centos-web/jekyll-theme-centos-base/documentation/page-layout/social/
 # ===============================================================================
-httpd_social:
-  - icon: "fab fa-twitter"
-    link: "https://twitter.com/centos"
-  - icon: "fab fa-youtube"
+httpd_common_social:
+  - name: YouTube
+    icon: "fab fa-youtube"
     link: "https://youtube.com/TheCentOSProject"
-  - icon: "fab fa-linkedin"
-    link: "https://www.linkedin.com/groups/22405"
-  - icon: "fab fa-reddit"
+  - name: Mastodon
+    icon: "fab fa-mastodon"
+    link: "https://fosstodon.org/@centos"
+  - name: Facebook
+    icon: "fab fa-facebook-f"
+    link: "https://www.facebook.com/CentOSProject"
+  - name: LinkedIn
+    icon: "fab fa-linkedin"
+    link: "https://www.linkedin.com/company/centos-project/"
+  - name: x
+    icon: "fab fa-x-twitter"
+    link: "https://x.com/centos"
+  - name: Discourse
+    icon: "fab fa-discourse"
+    link: "https://discussion.fedoraproject.org/c/neighbors/centos/"
+  - name: Reddit
+    icon: "fab fa-reddit"
     link: "https://www.reddit.com/r/CentOS/"
 
 # ===============================================================================
-# httpd_copyright - Set copyright sentence and related links.
+# httpd_common_copyright - Set copyright sentence and related links.
 #
 # This variable should be defined in a high scope location (e.g., under
 # `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
 # playbooks you run can take advantage of it reducing the number of places you
 # need to change.
+#
+# Related resources:
+# - https://centos.gitlab.io/artwork/centos-web/jekyll-theme-centos-base/documentation/page-layout/copyright-note/
 # ===============================================================================
-httpd_copyright:
+httpd_common_copyright:
   author: "The CentOS Project"
   year: "{{ ansible_facts.date_time.year }}"
   legals:
     - text: "Legal"
-      link: "{{ httpd_assets_url }}/legal"
+      link: "{{ httpd_common_assets }}/legal"
     - text: "Privacy"
-      link: "{{ httpd_assets_url }}/legal/privacy"
+      link: "{{ httpd_common_assets }}/legal/privacy"
     - text: "Site source"
       link: "https://git.centos.org/centos/centos.org"
 
+# ===============================================================================
+# httpd_common_title - Equivalent to site.title configuration variable in
+# jekyll site.
+#
+# This variable should be defined in a high scope location (e.g., under
+# `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
+# playbooks you run can take advantage of it reducing the number of places you
+# need to change.
+# ===============================================================================
+httpd_common_title: The CentOS Project
+
+# ===============================================================================
+# httpd_common_description - Equivalent to site.description configuration
+# variable in jekyll site.
+#
+# This variable should be defined in a high scope location (e.g., under
+# `group_vars/all.yml`, or `group_vars/webistes.yml`) so all website-related
+# playbooks you run can take advantage of it reducing the number of places you
+# need to change.
+# ===============================================================================
+httpd_common_description: |
+  Community-driven free software effort focused around the goal of providing a
+  rich base platform for open source communities to build upon.
 
 # For the vhost-shared-dir task
 # It permits to quickly share over http/https a local directory and not coming from a role
@@ -315,7 +360,7 @@ httpd_git_websites_list: []
 
 ######################################################################################
 # for vhost-docs.yml task
-# purpose : setup a vhost that will pull content from various docs git repositories 
+# purpose : setup a vhost that will pull content from various docs git repositories
 # and render through mkdocs-centos container (mkdocs and plugins in one container)
 # We can define some variables for this (default) and override if needed
 httpd_docs_hostname: docs.centos.org
@@ -327,6 +372,5 @@ httpd_docs_container_tag: 1.6.1
 httpd_docs_mkdocs_buildcmd: build
 httpd_docs_pkgs_list:
   - git
-# From which repository we need to pull from  
+# From which repository we need to pull from
 httpd_docs_git_url: https://gitlab.com/CentOS/docs/docs.centos.org.git
-

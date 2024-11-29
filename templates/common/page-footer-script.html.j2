@@ -1,0 +1,43 @@
+{% if page.with_highlight != false -%}
+<!-- Highlight.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script src="https://unpkg.com/highlightjs-copy@1.0.3/dist/highlightjs-copy.min.js"></script>
+<script>
+  document.querySelectorAll('.content code').forEach(el=>el.classList.add('hljs'));
+  hljs.addPlugin(new CopyButtonPlugin());
+  hljs.highlightAll();
+</script>
+{% endif -%}
+
+{% if page.with_datatables != false  -%}
+<!-- DataTables -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $("table.dataTable").DataTable({
+      "pageLength": 5,
+      "lengthMenu": [5,10,25,50,75,100]
+    });
+  });
+</script>
+{% endif %}
+
+<!-- BackToTop -->
+<script src="https://unpkg.com/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js"></script>
+<script>
+  addBackToTop({
+    diameter: 56,
+    backgroundColor: "#a14f8c",
+    textColor: "#fff",
+  });
+</script>
+
+<!-- Bootstrap -->
+<script src="{{ httpd_common_assets }}/assets/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Initialize Tooltips
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+</script>
