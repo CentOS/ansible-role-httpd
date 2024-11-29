@@ -1,0 +1,19 @@
+<div class="row">
+
+  {% if page.with_social != false %}
+  <div class="mt-3 col-sm-12 col-lg-8">
+  {% else %}
+  <div class="mt-3 col-sm-12">
+  {% endif %}
+    <div class="lead">{{ httpd_common_description }}</div>
+  </div>
+
+  {% if page.with_social != false %}
+  <div class="my-3 col-sm-12 col-lg-4 d-flex justify-content-sm-start justify-content-lg-end">
+    {% for item in httpd_common_social -%}
+    <a class="btn border-0 btn-outline-primary fs-4" href="{{ item.link }}" role="button" aria-label="{{ item.name }}" data-bs-placement="bottom" data-bs-title="{{ item.name }}"><i class="{{ item.icon }}"></i></a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>

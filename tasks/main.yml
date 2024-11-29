@@ -29,8 +29,8 @@
     - mpm
 
 - name: Ensuring httpd is installed
-  yum: 
-    name: httpd 
+  yum:
+    name: httpd
     state: installed
 
 - name: Systemd snippet directory
@@ -46,7 +46,7 @@
   with_items:
     - 01_common.conf
     - welcome.conf
-  notify: restart_httpd 
+  notify: restart_httpd
 
 - name: Distribute default CentOS header files
   copy:
@@ -61,12 +61,39 @@
     src: header.html.j2
     dest: /var/www/centos-design/header-{{ httpd_html_autoindex_title | lower | replace(" ","-") }}.html
     mode: 0644
+  vars:
+    page:
+      title: "People of CentOS"
+      title_lead: |
+        This is an area where the CentOS Developers and allowed contributors
+        can make test files and other things available that are not yet part of
+        CentOS. Some items here will make it into CentOS, CentOS Extras and/or
+        CentOS Plus ... while other things may not.
+      with_manifestation: "People"
+      with_content:
+        - element: p
+          element_class: alert alert-warning
+          element_content: >-
+            <strong>Caution:</strong> Use anything here at your own risk!
+        - element: p
+          element_content: >-
+            The following users currently have areas on people.centos.org:
+            (sorted by First name)
 
 - name: Creating CentOS default footer
   template:
-    src: common/footer.html.j2
+    src: common/page-footer.html.j2
     dest: /var/www/centos-design/footer.html
     mode: 0644
+  vars:
+    page:
+      with_social: true
+      with_datatables: false
+      with_highlight: false
+      with_shortcuts: false
+      with_finale: true
+      with_sponsors: false
+      with_copyright: true
 
 - name: Create directory for common resources
   file:
@@ -75,13 +102,34 @@
 
 - name: Create page not found file
   template:
-    src: "common/404.html.j2"
+    src: "common/page.html.j2"
     dest: "{{ httpd_common_directory }}/404.html"
+  vars:
+    page:
+      title: "404"
+      title_lead: "Page not found."
+      with_manifestation: ""
+      with_social: true
+      with_datatables: false
+      with_highlight: false
+      with_shortcuts: false
+      with_finale: true
+      with_sponsors: false
+      with_copyright: true
+      with_content:
+        - element: p
+          element_content: >-
+            The requested page could not be found.
+        - element: p
+          element_content: >-
+            This happens when the page has been moved, removed, or had its name
+            and address changed. It might otherwise be temporarily unavailable
+            for technical reasons.
 
 - name: Ensuring httpd service is started
-  service: 
-    name: httpd 
-    state: started 
+  service:
+    name: httpd
+    state: started
     enabled: true
 
 - name: Opening up httpd rule
@@ -122,7 +170,7 @@
         owner: root
       notify:
         - restart_httpd
-        
+
     - name: Configuring correct selinux boolean for mpm
       seboolean:
         name: httpd_graceful_shutdown
@@ -145,7 +193,7 @@
         reload_httpd
   when: httpd_mod_qos
 
-- block: 
+- block:
     - name: Configuring agent in Zabbix server
       include_role:
         name: zabbix-server
@@ -153,11 +201,10 @@
       vars:
         zabbix_templates: "{{ httpd_zabbix_templates }}"
         zabbix_groups: "{{ httpd_zabbix_groups }}"
-  delegate_to: "{{ zabbix_api_srv }}"  
+  delegate_to: "{{ zabbix_api_srv }}"
   tags:
     - monitoring
-  when: 
-    - zabbix_api_srv is defined 
+  when:
+    - zabbix_api_srv is defined
     - zabbix_api_srv != 'None'
     - zabbix_monitoring
-  

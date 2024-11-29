@@ -20,7 +20,7 @@
   loop_control:
     label : "{{ item.login_name }}"
 
-- name: Ensuring we have correct perms for httpd to read 
+- name: Ensuring we have correct perms for httpd to read
   file:
     path: "/home/{{ item.login_name }}"
     state: directory
@@ -42,19 +42,59 @@
     src: people-users.j2
     dest: "{{ httpd_people_dirname }}/index.html"
     mode: 0644
+  vars:
+    page:
+      title: People of CentOS
+      title_lead: |
+        This is an area where the CentOS Developers and allowed contributors
+        can make test files and other things available that are not yet part of
+        CentOS. Some items here will make it into CentOS, CentOS Extras and/or
+        CentOS Plus ... while other things may not.
+      with_manifestation: People
+      with_social: true
+      with_datatables: false
+      with_highlight: false
+      with_shortcuts: false
+      with_finale: true
+      with_sponsors: false
+      with_copyright: true
+      with_content:
+        - element: p
+          element_class: alert alert-warning
+          element_content: >-
+            <strong>Caution:</strong> Use anything here at your own risk!
+        - element: p
+          element_content: >-
+            The following users currently have areas on people.centos.org:
+            (sorted by First name)
 
 - name: Creating HEADER files for people
   template:
-    src: common/header-user.html.j2
+    src: common/page-header-user.html.j2
     dest: "{{ httpd_people_dirname }}/HEADER-{{ item.login_name }}.html"
     mode: 0644
   with_items: "{{ people_users }}"
+  vars:
+    page:
+      title: "{{ item.login_name }}"
+      title_lead: "{{ item.full_name }}"
+      with_manifestation: People
+      with_content: []
 
 - name: Creating FOOTER file for people
   template:
-    src: common/footer.html.j2
+    src: common/page-footer.html.j2
     dest: "{{ httpd_people_dirname }}/FOOTER.html"
     mode: 0644
+  vars:
+    page:
+      with_social: true
+      with_datatables: false
+      with_highlight: false
+      with_shortcuts: false
+      with_finale: true
+      with_sponsors: false
+      with_copyright: true
 
 - name: Configuring httpd vhost for people
   template:
@@ -88,4 +128,3 @@
   with_items:
     - custom-policy-ipv6
     - custom-policy
-    

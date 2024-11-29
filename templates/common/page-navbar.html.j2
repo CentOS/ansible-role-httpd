@@ -1,0 +1,36 @@
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark bg-image shadow" aria-label="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="https://www.{{ httpd_www_domain }}/"><img src="{{ httpd_common_assets }}/assets/img/{{ page.with_logo | default('centos-whitelogo.svg') }}" height="32" alt="{{ httpd_common_title }}" />{% if page.with_manifestation != "" %}<span class="manifestation border-start border-light ps-3 ms-3 py-2 fs-6">{{ page.with_manifestation }}</span>{% endif %}</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav ms-auto">
+        {% for navitem in httpd_common_navbar if "navbar" in navitem.visible_on -%}
+        {% if navitem.menu | length == 0 %}
+        <li class="nav-item">
+          {% if navitem.link | ansible.builtin.regex_search('^(http|https)://') %}
+          <a  href="{{ navitem.link }}" class="nav-link" role="presentation"><i class="{{ navitem.icon }} me-2"></i>{{ navitem.name }}</a>
+          {% else %}
+          <a href="{{ httpd_common_assets }}{{ navitem.link }}" class="nav-link" role="presentation"><i class="{{ navitem.icon }} me-2"></i>{{ navitem.name }}</a>
+          {% endif %}
+        </li>
+        {% else %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-{{ loop.index }}" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="{{ navitem.icon }} me-2"></i>{{ navitem.name }}</a>
+          <ul class="dropdown-menu dropdown-menu-dark shadow" aria-labelledby="navbarDropdown-{{ loop.index }}">
+            {% for dropdownitem in navitem.menu -%}
+            {% if dropdownitem.link | ansible.builtin.regex_search('^(http|https)://') %}
+            <li><a class="dropdown-item" role="presentation" href="{{ dropdownitem.link }}">{{ dropdownitem.name }}</a></li>
+            {% else %}
+            <li><a class="dropdown-item" role="presentation" href="{{ httpd_common_assets }}{{ dropdownitem.link }}">{{ dropdownitem.name }}</a></li>
+            {% endif %}
+            {% endfor -%}
+          </ul>
+        </li>
+        {% endif -%}
+        {% endfor -%}
+      </ul>
+    </div>
+  </div>
+</nav>
