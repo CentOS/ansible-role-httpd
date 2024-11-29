@@ -118,10 +118,10 @@
       with_copyright: true
       with_content:
         - element: p
-          element_content: |
+          element_content: >-
             The requested page could not be found.
         - element: p
-          element_content: |
+          element_content: >-
             This happens when the page has been moved, removed, or had its name
             and address changed. It might otherwise be temporarily unavailable
             for technical reasons.
