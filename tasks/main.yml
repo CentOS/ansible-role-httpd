@@ -63,22 +63,10 @@
     mode: 0644
   vars:
     page:
-      title: "People of CentOS"
-      title_lead: |
-        This is an area where the CentOS Developers and allowed contributors
-        can make test files and other things available that are not yet part of
-        CentOS. Some items here will make it into CentOS, CentOS Extras and/or
-        CentOS Plus ... while other things may not.
-      with_manifestation: "People"
-      with_content:
-        - element: p
-          element_class: alert alert-warning
-          element_content: >-
-            <strong>Caution:</strong> Use anything here at your own risk!
-        - element: p
-          element_content: >-
-            The following users currently have areas on people.centos.org:
-            (sorted by First name)
+      title: "CentOS"
+      title_lead: ''
+      with_manifestation: ""
+      with_content: []
 
 - name: Creating CentOS default footer
   template:
