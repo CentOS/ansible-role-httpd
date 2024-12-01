@@ -169,7 +169,7 @@ httpd_common_directory: "/var/www/common"
 # playbooks you run can take advantage of it reducing the number of places you
 # need to change.
 # ===============================================================================
-httpd_common_assets: "https://www.centos.org"
+httpd_common_assets: "https://{{ httpd_www_hostname }}"
 
 # ===============================================================================
 # httpd_common_navbar - Set website navigation bar.

@@ -1,6 +1,6 @@
 <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark bg-image shadow" aria-label="navbar">
   <div class="container">
-    <a class="navbar-brand" href="https://www.{{ httpd_www_domain }}/"><img src="{{ httpd_common_assets }}/assets/img/{{ page.with_logo | default('centos-whitelogo.svg') }}" height="32" alt="{{ httpd_common_title }}" />{% if page.with_manifestation != "" %}<span class="manifestation border-start border-light ps-3 ms-3 py-2 fs-6">{{ page.with_manifestation }}</span>{% endif %}</a>
+    <a class="navbar-brand" href="https://{{ httpd_www_hostname }}/"><img src="{{ httpd_common_assets }}/assets/img/{{ page.with_logo | default('centos-whitelogo.svg') }}" height="32" alt="{{ httpd_common_title }}" />{% if page.with_manifestation != "" %}<span class="manifestation border-start border-light ps-3 ms-3 py-2 fs-6">{{ page.with_manifestation }}</span>{% endif %}</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
