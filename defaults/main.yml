@@ -329,4 +329,4 @@ httpd_docs_pkgs_list:
   - git
 # From which repository we need to pull from  
 httpd_docs_git_url: https://gitlab.com/CentOS/docs/docs.centos.org.git
-
+httpd_docs_git_branch: main
