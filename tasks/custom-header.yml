@@ -3,14 +3,22 @@
 # - import_role:
 #     name: httpd
 #     tasks_from: custom-header
-#   vars: 
-#     - httpd_html_custom_header_title: "CentOS Stream Mirror" # html <title>
-#     - httpd_html_autoindex_title: "CentOS Stream Mirror"     # title for html body
-#     - httpd_html_autoindex_content: "{{ mirror_stream_httpd_header }}" # block that is injected before directory listing
-
+#   vars:
+#     - httpd_custom_header_page:
+#            title: 'CentOS Stream Mirror'
+#            title_lead: ''
+#            with_manifestation: ''
+#            with_content:
+#              - element: p
+#                element_class: alert alert-success
+#                element_content: >-
+#                  This directory tree contains new CentOS Stream releases, starting from release '9-stream'<br>
+#                  For previous CentOS Linux releases , see <a href="http://mirror.centos.org">CentOS mirror</a>.<br>
+#
 - name: Creating CentOS custom header
   template:
     src: header.html.j2
-    dest: /var/www/centos-design/header-{{ httpd_html_custom_header_title | lower | replace(" ","-") }}.html
+    dest: /var/www/centos-design/header-{{ page.title | lower | replace(" ","-") }}.html
     mode: 0644
-
+  vars:
+    page: "{{ httpd_custom_header_page }}"

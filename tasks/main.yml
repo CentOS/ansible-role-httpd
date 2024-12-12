@@ -62,11 +62,7 @@
     dest: /var/www/centos-design/header-{{ httpd_html_autoindex_title | lower | replace(" ","-") }}.html
     mode: 0644
   vars:
-    page:
-      title: "CentOS"
-      title_lead: ''
-      with_manifestation: ""
-      with_content: []
+    page: "{{ httpd_common_autoindex }}"
 
 - name: Creating CentOS default footer
   template:

@@ -300,6 +300,46 @@ httpd_common_description: |
   Community-driven free software effort focused around the goal of providing a
   rich base platform for open source communities to build upon.
 
+# Specific default header settings that can be overwritten if needed
+# Example:
+# httpd_common_autoindex:
+#   title: 'People of CentOS'
+#    title_lead: |
+#        This is an area where the CentOS Developers and allowed contributors
+#        can make test files and other things available that are not yet part of
+#        CentOS. Some items here will make it into CentOS, CentOS Extras and/or
+#        CentOS Plus ... while other things may not.
+#      with_manifestation: People
+#      with_social: true
+#      with_datatables: false
+#      with_highlight: false
+#      with_shortcuts: false
+#      with_finale: true
+#      with_sponsors: false
+#      with_copyright: true
+#      with_content:
+#        - element: p
+#          element_class: alert alert-warning
+#          element_content: >-
+#            <strong>Caution:</strong> Use anything here at your own risk!
+#        - element: p
+#          element_content: >-
+#            The following users currently have areas on people.centos.org:
+#            (sorted by First name)
+httpd_common_autoindex:
+  title: 'CentOS'
+  title_lead: ''
+  with_manifestation: ""
+  with_content: [] 
+
+# same thing but for custom-header task, inherited from other roles
+# That means we can override in these roles but let's still have default here
+httpd_custom_header_page:
+  title: 'CentOS'
+  title_lead: ''
+  with_manifestation: ''
+  with_content: []
+
 # For the vhost-shared-dir task
 # It permits to quickly share over http/https a local directory and not coming from a role
 # We can combine (all optional so default to all open):
