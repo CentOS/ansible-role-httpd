@@ -11,6 +11,7 @@ git_upstream="{{ httpd_docs_git_url }}"
 git_directory="/home/{{ httpd_docs_username }}/git/"
 logfile="/home/{{ httpd_docs_username }}/mkdocs-{{ httpd_docs_hostname }}.log"
 local_docs_git_repo=$(echo {{ httpd_docs_git_url }}|rev | cut -f 1 -d '/'|rev| sed 's/.git//')
+tracked_branch="{{ httpd_docs_git_branch }}"
 
 function usage() {
 cat << EOF
@@ -41,6 +42,7 @@ function init(){
   test -d ${git_directory} || mkdir -p ${git_directory}
   pushd ${git_directory} >/dev/null
   test -d ${local_docs_git_repo} || git clone --recurse-submodules --jobs=$(( $(grep "cpu cores" /proc/cpuinfo|head -n 1 | awk '{print $4}') * 2)) ${git_upstream} >>$logfile 2>&1 
+  pushd ${local_docs_git_repo} >/dev/null ; git checkout ${tracked_branch} >>$logfile 2>&1 ; popd >/dev/null
   container_check
   popd >/dev/null
   render
@@ -59,8 +61,9 @@ function render(){
 
 function build(){
   pushd ${git_directory}/${local_docs_git_repo} >/dev/null
+  git checkout ${tracked_branch} >>$logfile 2>&1
   last_commit=$(git log| head -n 1|awk '{print $2}')
-  git pull --recurse-submodules --jobs=$(( $(grep "cpu cores" /proc/cpuinfo|head -n 1 | awk '{print $4}') * 2)) >>$logfile 2>&1
+  git pull --recurse-submodules --jobs=$(( $(grep "cpu cores" /proc/cpuinfo|head -n 1 | awk '{print $4}') * 2)) origin ${tracked_branch} >>$logfile 2>&1
   current_commit=$(git log| head -n 1|awk '{print $2}')
   popd >/dev/null
 
