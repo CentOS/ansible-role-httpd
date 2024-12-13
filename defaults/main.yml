@@ -208,16 +208,14 @@ httpd_common_navbar:
     menu:
       - name: "About CentOS"
         link: "{{ httpd_common_assets }}/about"
-      - name: "Frequently Asked Questions (FAQs)"
-        link: "https://wiki.centos.org/FAQ"
       - name: "Special Interest Groups (SIGs)"
-        link: "https://wiki.centos.org/SpecialInterestGroups"
-      - name: "CentOS Variants"
-        link: "{{ httpd_common_assets }}/variants"
+        link: "{{ httpd_common_assets }}/sigs"
       - name: "Governance"
         link: "{{ httpd_common_assets }}/about/governance"
       - name: "Code of Conduct"
         link: "{{ httpd_common_assets }}/code-of-conduct"
+      - name: "Sponsors"
+        link: "{{ httpd_common_assets }}/sponsors"
     visible_on: ["navbar"]
 
 # ===============================================================================
