@@ -30,6 +30,10 @@ httpd_maxrequestworkers: 512
 # can be Prod, Full, Major, Minor, Min OS
 httpd_servertokens: Prod
 
+# logrotate settings
+# Keeping 4 weeks (default) but can be adjusted
+httpd_logrotate_keep: 4
+
 # snippet that can be injected into 01_common.conf
 httpd_common_snippet: |
   # This is a snippet block coming from ansible inventory

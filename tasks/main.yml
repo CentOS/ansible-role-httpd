@@ -48,6 +48,15 @@
     - welcome.conf
   notify: restart_httpd
 
+- name: Configuring logrotate for httpd process
+  template:
+    src: "templates/logrotate.d/{{ item }}.j2"
+    dest: "/etc/logrotate.d/{{ item }}"
+  with_items:
+    - httpd
+  tags:
+    - logrotate
+
 - name: Distribute default CentOS header files
   copy:
     src: "{{ item }}"

@@ -1,0 +1,14 @@
+
+# This file is managed by Ansible ! Don't edit manually !
+
+/var/log/httpd/*log {
+    rotate {{ httpd_logrotate_keep }}
+    missingok
+    notifempty
+    sharedscripts
+    delaycompress
+    postrotate
+        /bin/systemctl reload httpd.service > /dev/null 2>/dev/null || true
+    endscript
+}
+
