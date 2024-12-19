@@ -29,6 +29,24 @@
   template:
     src: docs-sigs/index.html.j2
     dest: "{{ httpd_docs_sigs_rootdir }}/index.html"
+
+  vars:
+    page:
+      title: CentOS SIGs
+      title_lead: "Welcome to the SpecialInterestGroups (SIGs) Documentation website"
+      with_manifestation: SIGs
+      with_social: true
+      with_datatables: false
+      with_highlight: false
+      with_shortcuts: false
+      with_finale: true
+      with_sponsors: false
+      with_copyright: true
+      with_content: 
+        - element: p
+          element_class: alert alert-success
+          element_content: >-
+            You can find below the SIGs that have requested a space on this server to build and host documentation : 
   tags:
     - index
 

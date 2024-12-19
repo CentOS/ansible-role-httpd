@@ -1,20 +1,5 @@
-{% with %}
-{# --- Header template configuration --------------------------- #}
-{% set title = "CentOS SIGs" %}
-{% set title_lead = "Welcome to the SpecialInterestGroups (SIGs) Documentation website" %}
-{% set alerts = [{
-  'title': ' ',
-  'class': 'alert alert-success',
-  'message': 'You can find below the SIGs that have requested a space on this server to build and host documentation : '
-  }]
-%}
-{% set paragraphs = [
-  ''
-  ]
-%}
 {# --- Header template ----------------------------------------- #}
-{% include "common/header.html.j2" %}
-{% endwith %}
+{% include "common/page-header.html.j2" %}
 
 {# --- Body ---------------------------------------------------- #}
 <ul class="list-group list-group-flush">
@@ -25,5 +10,5 @@
 
 
 {# --- Footer -------------------------------------------------- #}
-{% include "common/footer.html.j2" %}
+{% include "common/page-footer.html.j2" %}
  
