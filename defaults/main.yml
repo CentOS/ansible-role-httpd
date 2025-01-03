@@ -408,8 +408,8 @@ httpd_git_websites_list: []
 httpd_docs_hostname: docs.centos.org
 httpd_docs_username: mkdocsbot
 # where to find container and which tag
-httpd_docs_container: quay.io/centosci/mkdocs-centos
-httpd_docs_container_tag: 1.6.1
+httpd_docs_container: quay.io/centos-infra/mkdocs-centos
+httpd_docs_container_tag: latest
 # how to call mkdocs-centos cmd through podman
 httpd_docs_mkdocs_buildcmd: build
 httpd_docs_pkgs_list:

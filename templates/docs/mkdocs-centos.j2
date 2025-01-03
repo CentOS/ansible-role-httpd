@@ -50,7 +50,7 @@ function init(){
 
 function render(){
   container_check
-  podman run --volume="${git_directory}/${local_docs_git_repo}:/docs:z" --rm -it ${container_path}:${container_tag} {{ httpd_docs_mkdocs_buildcmd }} >>$logfile 2>&1
+  podman run --pull=newer --volume="${git_directory}/${local_docs_git_repo}:/docs:z" --rm -it ${container_path}:${container_tag} {{ httpd_docs_mkdocs_buildcmd }} >>$logfile 2>&1
   if [ "$?" -eq "0" ] ; then
     f_log "Rendering status : $? => syncing to /var/www/{{ httpd_docs_hostname }}"
     rsync -aH --delete-after ${git_directory}/${local_docs_git_repo}/site/ /var/www/{{ httpd_docs_hostname }}
