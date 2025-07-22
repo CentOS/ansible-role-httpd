@@ -185,6 +185,8 @@
       notify:
         reload_httpd
   when: httpd_mod_qos
+  tags:
+    - qos
 
 - block:
     - name: Configuring agent in Zabbix server
