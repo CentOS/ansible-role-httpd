@@ -115,7 +115,7 @@ httpd_www_local_users:
   - name: centos_staging
     branch: staging
 
-httpd_www_git_upstream: https://git.centos.org/centos/centos.org.git
+httpd_www_git_upstream: https://gitlab.com/CentOS/promo/centos.org.git
 # Servers we need to push content to
 httpd_www_servers: "web1.test.centos.org web2.test.centos.org"
 httpd_stg_zabbix_templates:
