@@ -34,5 +34,8 @@ MaxConnectionsPerChild    {{ httpd_maxrequestworkers * 5 }}
 # ServerTokens https://httpd.apache.org/docs/2.4/mod/core.html#servertokens
 ServerTokens {{ httpd_servertokens }}
 
+# Disabling Trace/Track https://access.redhat.com/solutions/198813
+TraceEnable off
+
 # Custom snippet if declared as ansible httpd_common_snippet block
 {{ httpd_common_snippet }}
