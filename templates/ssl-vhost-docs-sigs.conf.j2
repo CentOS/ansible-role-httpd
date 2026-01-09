@@ -9,7 +9,7 @@
  Header always set X-Content-Type-Options "nosniff"
  Header always set Referrer-Policy "same-origin"
 
-RewriteEngine on
+{{ httpd_docs_sigs_vhost_snippet }}
 
 
 ErrorLog logs/ssl-{{ httpd_docs_sigs_hostname }}_error.log

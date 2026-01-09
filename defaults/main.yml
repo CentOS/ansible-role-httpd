@@ -97,6 +97,9 @@ httpd_docs_sigs_hostname: sigs.centos.org
 #     doc_git_origin: https://git.centos.org/centos/centos-infra-docs.git
 #     description: the CentOS Infra SIG documentation
 httpd_docs_sigs_list: []
+# some eventual vhost snippet to be injected
+httpd_docs_sigs_vhost_snippet: |
+  # This block is injected into httpd vhost conf (ideal for rewriterules defined at inventory level)
 
 # For www task
 httpd_www_rootdir: /var/www/centos_website
