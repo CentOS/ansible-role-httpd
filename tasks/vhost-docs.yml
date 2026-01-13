@@ -20,6 +20,8 @@
     - ssl-docs.conf
   notify:
     - restart_httpd
+  tags:
+    - config
 
 - name: Ensuring we have a docroot
   file:

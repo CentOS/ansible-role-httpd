@@ -420,3 +420,7 @@ httpd_docs_pkgs_list:
 # From which repository we need to pull from
 httpd_docs_git_url: https://gitlab.com/CentOS/docs/docs.centos.org.git
 httpd_docs_git_branch: main
+
+httpd_docs_vhost_snippet: |
+  # This block is injected into httpd vhost conf (ideal for rewriterules defined at inventory level)
+

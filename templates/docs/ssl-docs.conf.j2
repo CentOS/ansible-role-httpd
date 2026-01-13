@@ -9,6 +9,8 @@
  Header always set Referrer-Policy "same-origin"
  Header always set X-Frame-Options "SAMEORIGIN"
 
+{{ httpd_docs_vhost_snippet }}
+
 ErrorLog logs/ssl-{{ httpd_docs_hostname }}_error.log
 TransferLog logs/ssl-{{ httpd_docs_hostname }}_access.log
 LogLevel warn
