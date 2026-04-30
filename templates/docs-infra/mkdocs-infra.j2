@@ -7,7 +7,7 @@
 #
 
 action="$1"
-git_upstream="https://gitlab.com/CentOS/infra/docs.git/" # Where to git clone/pull from
+git_upstream="https://gitlab.com/CentOS/infra/docs.git" # Where to git clone/pull from
 git_directory="/home/{{ httpd_docs_infra_user }}/git/"
 logfile="/home/{{ httpd_docs_infra_user }}/mkdocs-infra.log"
 
@@ -28,14 +28,14 @@ f_log() {
 function init(){
   test -d ${git_directory} || mkdir -p ${git_directory}
   pushd ${git_directory} >/dev/null
-  test -d centos-infra-docs || git clone ${git_upstream} >> $logfile
+  test -d docs || git clone ${git_upstream} >> $logfile
   podman images |grep -q mkdocs-material || podman pull docker.io/squidfunk/mkdocs-material:latest >>$logfile
 popd >/dev/null
   render
 }
 
 function render(){
-  podman run --volume="${git_directory}/centos-infra-docs:/docs:z" --rm -it squidfunk/mkdocs-material build 2>&1 > /dev/null && cp -r ${git_directory}/centos-infra-docs/site/* /var/www/docs.infra/
+  podman run --volume="${git_directory}/docs:/docs:z" --rm -it squidfunk/mkdocs-material build 2>&1 > /dev/null && cp -r ${git_directory}/docs/site/* /var/www/docs.infra/
   if [ "$?" -eq "0" ] ; then
     f_log "Rendering status : $?"
   else
@@ -44,7 +44,7 @@ function render(){
 }
 
 function build(){
-  pushd ${git_directory}/centos-infra-docs >/dev/null
+  pushd ${git_directory}/docs >/dev/null
   last_commit=$(git log| head -n 1|awk '{print $2}')
   git pull >/dev/null
   current_commit=$(git log| head -n 1|awk '{print $2}')
