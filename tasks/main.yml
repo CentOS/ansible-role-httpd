@@ -92,7 +92,16 @@
   file:
     path: "{{ httpd_common_directory }}"
     state: directory
+  tags:
+    - common
 
+- name: Render robots.txt
+  template:
+    src: robots.txt.j2
+    dest: "{{ httpd_common_directory }}/robots.txt"
+  tags:
+    - common
+    - robots
 - name: Create page not found file
   template:
     src: "common/page.html.j2"

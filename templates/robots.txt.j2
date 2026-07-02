@@ -1,0 +1,13 @@
+{% if httpd_robots_block_ai_agents %}
+# AI bot/agents are not welcome and ansible boolean httpd_robots_block_ai_agents is turned on on role/host
+{% for agent in httpd_robots_block_ai_agents_list %}
+User-agent: {{ agent }}
+{% endfor %}
+Disallow: /
+
+{% endif %}
+# This is the common httpd_robots_snippet variable/block from inventory/role
+{{ httpd_robots_snippet }}
+# Nothing else blocked, so allowing the rest by default
+User-agent: *
+Allow: /

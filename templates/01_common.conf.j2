@@ -15,6 +15,7 @@ NameVirtualHost *:80
 # Default Header
 Alias /header /var/www/centos/header
 Alias /centos-design /var/www/centos-design
+Alias /robots.txt  {{ httpd_common_directory }}/robots.txt
 
 # Alias to common resources
 Alias "{{ httpd_common_alias }}" "{{ httpd_common_directory }}"
@@ -39,3 +40,11 @@ TraceEnable off
 
 # Custom snippet if declared as ansible httpd_common_snippet block
 {{ httpd_common_snippet }}
+
+{% if httpd_robots_block_ai_agents %}
+# httpd_robots_block_ai_agents boolean turned on so blocking all identified agents directly
+# This is coming from https://github.com/ai-robots-txt/ai.robots.txt/blob/main/.htaccess so update on regular basis
+RewriteEngine On
+RewriteCond %{HTTP_USER_AGENT} ({{ httpd_robots_block_ai_agents_list | map('replace', '-', '\\-') | map('replace', '.', '\\.')| map('replace', ' ', '\\ ') | join('|') }}) [NC]
+RewriteRule !^/?robots\.txt$ - [F]
+{% endif %}

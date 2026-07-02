@@ -11,6 +11,175 @@ httpd_tls_ciphers: |
   SSLCipherSuite          ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305
   SSLHonorCipherOrder     off
 
+# Robots.txt is a jinja2 template and deployed everywhere but wide-open
+# you can tune it with the following lists/snippets:
+httpd_robots_snippet: |
+  User-agent: my_agent
+  Disallow: /
+# Do we want to block some default ai crawlers/bots ? 
+# If so, set boolean to True but also visit https://github.com/ai-robots-txt/ai.robots.txt to update this list/variable
+httpd_robots_block_ai_agents: False
+httpd_robots_block_ai_agents_list:
+  - AddSearchBot
+  - AgentTimes
+  - AI2Bot
+  - AI2Bot-DeepResearchEval
+  - Ai2Bot-Dolma
+  - aiHitBot
+  - amazon-kendra
+  - Amazonbot
+  - AmazonBuyForMe
+  - Amzn-SearchBot
+  - Amzn-User
+  - Andibot
+  - Anomura
+  - anthropic-ai
+  - ApifyBot
+  - ApifyWebsiteContentCrawler
+  - Applebot
+  - Applebot-Extended
+  - Aranet-SearchBot
+  - atlassian-bot
+  - Awario
+  - AzureAI-SearchBot
+  - bedrockbot
+  - bigsur.ai
+  - Bravebot
+  - Brightbot
+  - Brightbot 1.0
+  - BuddyBot
+  - Bytespider
+  - CCBot
+  - Channel3Bot
+  - ChatGLM-Spider
+  - ChatGPT Agent
+  - ChatGPT-User
+  - Claude-Code
+  - Claude-SearchBot
+  - Claude-User
+  - Claude-Web
+  - ClaudeBot
+  - Cloudflare-AutoRAG
+  - CloudVertexBot
+  - Code
+  - cohere-ai
+  - cohere-training-data-crawler
+  - Cotoyogi
+  - CragCrawler
+  - Crawl4AI
+  - Crawlspace
+  - Cursor
+  - Datenbank Crawler
+  - DeepSeekBot
+  - Devin
+  - Diffbot
+  - DuckAssistBot
+  - Echobot Bot
+  - EchoboxBot
+  - ExaBot
+  - FacebookBot
+  - facebookexternalhit
+  - Factset_spyderbot
+  - FirecrawlAgent
+  - FriendlyCrawler
+  - GeistHaus-PageFetcher
+  - Gemini-Deep-Research
+  - Google-Agent
+  - Google-CloudVertexBot
+  - Google-Extended
+  - Google-Firebase
+  - Google-Gemini-CLI
+  - Google-NotebookLM
+  - GoogleAgent-Mariner
+  - GoogleAgent-URLContext
+  - GoogleOther
+  - GoogleOther-Image
+  - GoogleOther-Video
+  - GPTBot
+  - HenkBot
+  - iAskBot
+  - iaskspider
+  - iaskspider/2.0
+  - IbouBot
+  - ICC-Crawler
+  - ImagesiftBot
+  - imageSpider
+  - img2dataset
+  - ISSCyberRiskCrawler
+  - kagi-fetcher
+  - Kangaroo Bot
+  - Kimi-User
+  - KlaviyoAIBot
+  - KunatoCrawler
+  - laion-huggingface-processor
+  - LAIONDownloader
+  - LCC
+  - LinerBot
+  - Linguee Bot
+  - LinkupBot
+  - Manus-User
+  - meta-externalagent
+  - Meta-ExternalAgent
+  - meta-externalfetcher
+  - Meta-ExternalFetcher
+  - meta-webindexer
+  - MistralAI-User
+  - MistralAI-User/1.0
+  - MyCentralAIScraperBot
+  - NagetBot
+  - netEstate Imprint Crawler
+  - newsai
+  - NotebookLM
+  - NovaAct
+  - OAI-SearchBot
+  - omgili
+  - omgilibot
+  - OpenAI
+  - opencode
+  - Operator
+  - PanguBot
+  - Panscient
+  - panscient.com
+  - Perplexity-User
+  - PerplexityBot
+  - PetalBot
+  - PhindBot
+  - Poggio-Citations
+  - Poseidon Research Crawler
+  - QualifiedBot
+  - Querit-SearchBot
+  - QueritBot
+  - QuillBot
+  - quillbot.com
+  - SBIntuitionsBot
+  - Scrapy
+  - SemrushBot-OCOB
+  - SemrushBot-SWA
+  - Shap-User
+  - ShapBot
+  - Sidetrade indexer bot
+  - Spider
+  - TavilyBot
+  - Terra Cotta
+  - TerraCotta
+  - Thinkbot
+  - TikTokSpider
+  - Timpibot
+  - Trae
+  - TwinAgent
+  - UseAI
+  - VelenPublicWebCrawler
+  - WARDBot
+  - Webzio-Extended
+  - webzio-extended
+  - wpbot
+  - WRTNBot
+  - YaK
+  - YandexAdditional
+  - YandexAdditionalBot
+  - YouBot
+  - ZanistaBot
+
 # Central LetsEncrypt node for the cerbot redirection
 httpd_redirect_acmechallenge: True
 httpd_certbot_fqdn: certbot.domain.com
