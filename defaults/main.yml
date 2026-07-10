@@ -194,6 +194,8 @@ httpd_certbot_fqdn: certbot.domain.com
 
 # Apache httpd settings (see https://httpd.apache.org/docs/current/mod/mpm_common.html)
 httpd_maxrequestworkers: 512
+httpd_maxconnectionsperchild: "{{ httpd_maxrequestworkers * 5 }}"
+httpd_serverlimit: "{{ httpd_maxrequestworkers * 1.5 }}"
 
 # Apache servertokens (https://httpd.apache.org/docs/2.4/mod/core.html#servertokens)
 # can be Prod, Full, Major, Minor, Min OS

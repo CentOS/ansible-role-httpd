@@ -28,9 +28,9 @@ Alias "{{ httpd_common_alias }}" "{{ httpd_common_directory }}"
 ErrorDocument 404 {{ httpd_common_alias }}/404.html
 
 # mpm module tuning (common for prefork, worker, event modes)
-ServerLimit               {{ httpd_maxrequestworkers * 1.5 }}
+ServerLimit               {{ httpd_serverlimit }}
 MaxRequestWorkers         {{ httpd_maxrequestworkers }}
-MaxConnectionsPerChild    {{ httpd_maxrequestworkers * 5 }}
+MaxConnectionsPerChild    {{ httpd_maxconnectionsperchild }}
 
 # ServerTokens https://httpd.apache.org/docs/2.4/mod/core.html#servertokens
 ServerTokens {{ httpd_servertokens }}
