@@ -163,6 +163,9 @@
 - include_tasks: tls.yml
   when: httpd_tls
 
+- include_tasks: auth-openidc.yml
+  when: httpd_auth_openidc
+
 - block:
     - name: Configuring httpd mpm mode
       template:

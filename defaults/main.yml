@@ -595,3 +595,15 @@ httpd_docs_git_branch: main
 httpd_docs_vhost_snippet: |
   # This block is injected into httpd vhost conf (ideal for rewriterules defined at inventory level)
 
+
+# mod_auth_openidc settings
+# Do we want to use mod_auth_openidc for httpd itself (outside of deployed app doing itself auth)
+httpd_auth_openidc: False
+# If true, define needed variables (read https://github.com/OpenIDC/mod_auth_openidc)
+# Where to send authentication requests to (your idp)
+httpd_auth_openidc_idp_url: https://id.centos.org/idp/openidc/.well-known/openid-configuration
+httpd_auth_openidc_client: your_idp_client_id
+httpd_auth_openidc_secret: your_idp_secret
+httpd_auth_openidc_redirect_uri : /koji
+# this one can be generated with `openssl rand -base64 32` or even more (just local to httpd for the sessions, nothing related to idp itself (using client/secret above
+httpd_auth_openidc_cryptopassphrase: a_long_random_secure_passphrase_here

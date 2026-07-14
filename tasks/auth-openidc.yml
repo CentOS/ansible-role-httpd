@@ -1,0 +1,5 @@
+- name: Ensuring mod_auth_openidc is installed
+  yum:
+    name: mod_auth_openidc
+    state: latest
+
