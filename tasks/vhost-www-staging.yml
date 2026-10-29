@@ -85,8 +85,8 @@
 
 - name: rss2json util
   template:
-    src: www/rss2json.py
-    dest: /usr/libexec/centos/rss2json.py
+    src: www/feed_fetch.py
+    dest: /usr/libexec/centos/feed_fetch.py
     mode: 0755
     owner: root
   tags:

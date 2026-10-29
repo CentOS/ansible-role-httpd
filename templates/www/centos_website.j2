@@ -77,8 +77,7 @@ function refresh(){
     fi
   done 
   test -d centos || mkdir -p centos     
-  #/usr/libexec/centos/rss2json.py -i https://blog.centos.org/feed -o centos/blog.json
-  curl --silent --fail 'https://api.rss2json.com/v1/api.json?rss_url=https://blog.centos.org/feed' > centos/blog.json
+  /usr/libexec/centos/feed_fetch.py >/dev/null 2>&1 
   if [ "$?" -ne "0" ] ;then
     git checkout centos/blog.json
     f_log "[ERROR] Issue refreshing rss feed from blog.centos.org"
